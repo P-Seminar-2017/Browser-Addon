@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Gymlap</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link type="text/css" rel="stylesheet" href="css/normalize.css">
+  <link type="text/css" rel="stylesheet" href="css/materialize.css">
+  <link type="text/css" rel="stylesheet" href="css/popup.css">
+</head>
+
+<body>
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/materialize.js"></script>
+  <script type="text/javascript" src="js/popup.js"></script>
+
+  <nav>
+    <div class="nav-wrapper teal lighten-2">
+      <a href="#" class="brand-logo center">Gymlap Hausi Planer</a>
+      <ul class="right">
+        <li><a id="settings-link" href="#"><i class="material-icons">settings</i></a></li>
+      </ul>
+    </div>
+    <div id="loader" class="progress">
+      <div class="indeterminate"></div>
+    </div>
+  </nav>
+
+  <div id="after-submit" class="container"></div>
+
+  <main id="main">
+    <div class="container">
+      <h5>Hausaufgaben hier eintragen</h5>
+
+      <div class="row">
+        <form class="col s4">
+          <select id="select_fach"></select>
+        </form>
+        <p class="col s1">
+          <input type="checkbox" id="oberstufe-box" />
+          <label for="oberstufe-box">Q</label>
+        </p>
+        <form class="col s3 offset-s1">
+          <select id="select_klasse"></select>
+        </form>
+        <form class="col s3">
+          <select id="select_stufe"></select>
+        </form>
+      </div>
+
+      <div class="row">
+        <form class="col s12">
+          <label for="datepicker1">Datum zum abgeben der Hausi</label>
+          <input id="datepicker1" type="text" class="datepicker">
+        </form>
+      </div>
+
+      <div class="row">
+        <form class="col s12">
+          <div class="row">
+            <div class="input-field col s12">
+              <label for="textarea1">Hausaufgaben und Notizen</label>
+              <textarea id="textarea1" class="materialize-textarea">Lernen!</textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <button id="submit-btn" class="btn waves-effect waves-light" type="submit" name="action">Speichern
+          <i class="material-icons right">send</i>
+        </button>
+    </div>
+  </main>
+</body>
+
+</html>
