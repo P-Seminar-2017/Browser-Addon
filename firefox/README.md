@@ -1,1 +1,1 @@
-#Mozilla Firefox Extension
+# Mozilla Firefox Extension
