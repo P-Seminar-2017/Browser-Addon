@@ -1,4 +1,4 @@
 # Browser-Extension
 
 - Chrome: Working, not finished
-- Firefox: Mostly not working
+- Firefox: Mostly working, but sending and receiving data doesn't work
