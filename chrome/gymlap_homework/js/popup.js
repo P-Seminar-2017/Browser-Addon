@@ -9,17 +9,26 @@ $(document).ready(function() {
   chrome.storage.sync.get({
     //Default
     loadFromWebsite: false,
+    manualTime: false,
     loadingTime: false
   }, function(storage) {
-    preload(storage.loadFromWebsite, storage.loadingTime);
+    preload(storage.loadFromWebsite, storage.loadingTime, storage.manualTime);
   });
 
-  function preload(loadFromWebsite, loadingTime) {
+  function preload(loadFromWebsite, loadingTime, manualTime) {
     $("#loader").hide();
     $("#main").hide();
     $("#after-submit").hide();
 
     loadPageData(loadFromWebsite);
+
+    if (manualTime) {
+      //Standard im HTML
+    } else {
+      //Timepicker entfernen
+      $("#form_timepicker1").hide();
+      $("#form_datepicker1").removeClass("s6").addClass("s12");
+    }
 
     if (loadingTime) {
       $("#loader").delay(500).fadeIn().delay(1000).fadeOut();
@@ -74,23 +83,27 @@ $(document).ready(function() {
     $("#main").hide();
 
     $("#loader").delay(500).fadeIn();
-    //$("#loader").delay(500).fadeIn().delay(1000).fadeOut();
 
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
+    $.get("http://api.lakinator.bplaced.net/request.php", {
+      fach: "" + data.fach,
+      klasse: "" + data.klasse,
+      stufe: "" + data.stufe,
+      date: "" + data.date,
+      text: "" + data.text
+    }, function(data, status, xhr) {
+      if (status == "success") {
         $("#after-submit").append("<h5 class='center-align'>" + "- Daten erfolgreich gespeichert -" + "</h5>");
-        $("#after-submit").append("<h6 class='center-align'>Response: </br>" + xhttp.responseText + "</h6>");
+        $("#after-submit").append("<h6 class='center-align'>Response: </br>" + data + "</h6>");
+
+        $("#loader").delay(500).fadeOut();
+        $("#after-submit").delay(1000).fadeIn();
+      } else {
+        $("#after-submit").append("<h5 class='center-align'>" + "- Error: " + status + " -" + "</h5>");
 
         $("#loader").delay(500).fadeOut();
         $("#after-submit").delay(1000).fadeIn();
       }
-    };
-
-    var url = `http://api.lakinator.bplaced.net/request.php?fach=${data.fach}&klasse=${data.klasse}&stufe=${data.stufe}&date=${data.date}&text=${data.text}`;
-
-    xhttp.open("GET", url, true);
-    xhttp.send();
+    });
 
   }
 
@@ -98,11 +111,26 @@ $(document).ready(function() {
    *
    * BUTTON SEND
    *
+   * Function to use timestamp (d_date) in JAVA:
+   *
+   * public String longToDate(Long l) {
+   *    java.util.Calendar c = java.util.Calendar.getInstance();
+   *    c.setTime(new java.util.Date(l));
+   *    return String.format("%s.%s.%s %s:%s",
+   *            c.get(Calendar.DATE),
+   *            (c.get(Calendar.MONTH) + 1),
+   *            c.get(Calendar.YEAR),
+   *            c.get(Calendar.HOUR_OF_DAY),
+   *            c.get(Calendar.MINUTE)
+   *    );
+   *  }
+   *
    */
 
   var btn = document.getElementById("submit-btn");
   btn.addEventListener("click", function() {
     //TODO Daten schicken (wohin?)
+
     var d_fach = $(dropdown_fach_id).val();
     var d_klasse = $(dropdown_klasse_id).val();
     var d_stufe = $(dropdown_stufe_id).val();
@@ -113,11 +141,17 @@ $(document).ready(function() {
     month -= 1; //JS zählt Monate von 0 nach 11
     var day = $('.datepicker').pickadate('picker').get('highlight', 'dd');
 
-    var d_date = new Date(year, month, day).getTime();
+    var temp_val = $("#timepicker1").val();
+    var hours = temp_val[0] + temp_val[1];
+    var minutes = temp_val[3] + temp_val[4];
+
+    var d_date = new Date(year, month, day, hours, minutes).getTime();
+
     var d_text = $("#textarea1").val();
 
-
-    var d_array = ["Fach: " + d_fach, "Klasse: " + d_klasse, "Stufe/Kurs: " + d_stufe, "Abgabedatum: " + d_date, "Hausi: " + d_text];
+    // !Debug!
+    // var d_array = ["Fach: " + d_fach, "Klasse: " + d_klasse, "Stufe/Kurs: " + d_stufe, "Abgabedatum: " + d_date, "Hausi: " + d_text];
+    // console.log(d_array);
 
     finish({
       fach: d_fach,
@@ -134,11 +168,11 @@ $(document).ready(function() {
    *
    */
 
-  var $input = $('.datepicker').pickadate({
+  var $datepicker = $('.datepicker').pickadate({
     selectMonths: true,
     selectYears: 6,
     today: 'Heute',
-    clear: 'Loeschen',
+    clear: 'Löschen',
     close: 'Ok',
     format: 'dddd, dd mmmm yyyy',
     monthsFull: ['Januar', 'Februar', 'M\u00E4rz', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
@@ -149,8 +183,27 @@ $(document).ready(function() {
     closeOnSelect: false
   });
 
-  var picker = $input.pickadate('picker');
-  picker.set('select', new Date());
+  var date_picker = $datepicker.pickadate('picker');
+  date_picker.set('select', new Date());
+
+  /*
+   *
+   * Timepicker
+   *
+   */
+
+  var $timepicker = $('.timepicker').pickatime({
+    default: 'now',
+    fromnow: 0,
+    twelvehour: false,
+    donetext: 'OK',
+    cleartext: 'Löschen',
+    canceltext: 'Zurück',
+    autoclose: false,
+    ampmclickable: true
+  });
+
+  $timepicker.val("16:00"); //Default value
 
   /*
    *
@@ -290,6 +343,7 @@ $(document).ready(function() {
     chrome.tabs.create({
       url: "options.html"
     });
+    window.close(); //Sicherheitshalber
     //chrome.runtime.openOptionsPage();
   });
 
