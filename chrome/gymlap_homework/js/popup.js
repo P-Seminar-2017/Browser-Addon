@@ -427,6 +427,8 @@ function updateDropdown(dropdownid, active, disabled, array) {
   // add new value
   var value = active;
   var d = disabled ? "disabled" : "";
+  
+  $selectDropdown.prop("disabled", array.length == 0);
 
   $selectDropdown.append($("<option " + d + " selected></option>").attr("value", value).text(value));
   for (var i = 0; i < array.length; i++) {
