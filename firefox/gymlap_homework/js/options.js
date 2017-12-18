@@ -23,7 +23,7 @@ $(document).ready(function() {
     $(label_manualTime_id).text("Manuell Zeit zum Erinnern der Schüler einstellen - " + (storage.manualTime ? "On" : "Off"));
     $(box_manualTime_id).prop("checked", storage.manualTime);
 
-    $(label_loadingTime_id).text("Simulate loading times - " + (storage.loadingTime ? "On" : "Off"));
+    $(label_loadingTime_id).text("Ladezeiten simulieren - " + (storage.loadingTime ? "On" : "Off"));
     $(box_loadingTime_id).prop("checked", storage.loadingTime);
   });
 
