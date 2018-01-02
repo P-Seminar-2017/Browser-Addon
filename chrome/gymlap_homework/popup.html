@@ -13,12 +13,20 @@
 <body>
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/materialize.js"></script>
+  <script type="text/javascript" src="js/data.js"></script>
+  <script type="text/javascript" src="js/navigation.js"></script>
+  <script type="text/javascript" src="js/init.js"></script>
   <script type="text/javascript" src="js/popup.js"></script>
 
   <nav>
     <div class="nav-wrapper teal lighten-2">
       <a href="#" class="brand-logo center">Gymlap Hausi Planer</a>
+      <ul class="left">
+        <li><a id="home-link" href="#"><i class="material-icons">home</i></a></li>
+        <li><a id="booklist-link" href="#"><i class="material-icons">view_column</i></a></li>
+      </ul>
       <ul class="right">
+        <li><a id="fullscreen-link" href="#"><i class="material-icons">crop_free</i></a></li>
         <li><a id="settings-link" href="#"><i class="material-icons">settings</i></a></li>
       </ul>
     </div>
@@ -27,53 +35,64 @@
     </div>
   </nav>
 
-  <div id="after-submit" class="container"></div>
-
   <main id="main">
+    <div id="homework_submit" class="container"></div>
+
     <div class="container">
-      <h5>Hausaufgaben hier eintragen</h5>
+      <h5 id="headline">Hausaufgaben hier eintragen</h5>
 
-      <div class="row">
-        <form class="col s4">
-          <select id="select_fach"></select>
-        </form>
-        <p class="col s1">
-          <input type="checkbox" id="oberstufe-box" />
-          <label for="oberstufe-box">Q</label>
-        </p>
-        <form class="col s3 offset-s1">
-          <select id="select_klasse"></select>
-        </form>
-        <form class="col s3">
-          <select id="select_stufe"></select>
-        </form>
+      <div id="homework_choose_form">
+        <div class="row">
+          <form class="col s4">
+            <select id="select_fach"></select>
+          </form>
+          <p class="col s1">
+            <input type="checkbox" id="oberstufe-box" />
+            <label for="oberstufe-box">Q</label>
+          </p>
+          <form class="col s3 offset-s1">
+            <select id="select_klasse"></select>
+          </form>
+          <form class="col s3">
+            <select id="select_stufe"></select>
+          </form>
+        </div>
       </div>
 
-      <div class="row">
-        <form id="form_datepicker1" class="col s6">
-          <label for="datepicker1">Datum zum abgeben der Hausi</label>
-          <input id="datepicker1" type="text" class="datepicker">
-        </form>
-        <form id="form_timepicker1" class="col s6">
-          <label for="timepicker1">Uhrzeit zum Erinnern der Schüler</label>
-          <input id="timepicker1" type="text" class="timepicker">
-        </form>
-      </div>
+      <div id="homework_edit">
+        <div class="row">
+          <form class="col s6">
+            <label for="select_date">Abgabe</label>
+            <select class="icons" id="select_date">
+              <option value="NEXT">Nächste Stunde</option>
+              <option value="NEXT2">Übernächste Stunde</option>
+              <option value="DATE">Datum...</option>
+            </select>
+          </form>
+          <form id="form_datepicker1" class="col s6">
+            <label for="datepicker1">Datum festlegen</label>
+            <input id="datepicker1" type="text" class="datepicker" disabled>
+          </form>
+        </div>
 
-      <div class="row">
-        <form class="col s12">
-          <div class="row">
-            <div class="input-field col s12">
-              <label for="textarea1">Hausaufgaben und Notizen</label>
-              <textarea id="textarea1" class="materialize-textarea">Lernen!</textarea>
+        <div class="row">
+          <form class="col s12">
+            <div class="row">
+              <div class="input-field col s12">
+                <label for="textarea1">Hausaufgaben und Notizen</label>
+                <textarea id="textarea1" class="materialize-textarea" data-length="120">Lernen!</textarea>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
+
+        <button id="submit-btn" class="btn waves-effect waves-light" type="submit" name="action">Speichern
+            <i class="material-icons right">send</i>
+          </button>
       </div>
 
-      <button id="submit-btn" class="btn waves-effect waves-light" type="submit" name="action">Speichern
-          <i class="material-icons right">send</i>
-        </button>
+      <div id="homework_view">
+      </div>
     </div>
   </main>
 </body>
