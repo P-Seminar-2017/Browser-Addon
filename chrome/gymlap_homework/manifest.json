@@ -3,12 +3,14 @@
 
   "name": "Gymlapp Hausaufgaben Planer",
   "description": "Gymlapp Hausaufgaben Planer",
-  "version": "1.0",
+  "version": "1.0.0",
   "icons": {
     "16": "img/icon.png",
     "48": "img/icon.png",
     "128": "img/icon.png"
   },
+
+  "update_url": "https://www.google.com",
 
   "content_scripts": [{
     "matches": [
@@ -21,8 +23,15 @@
     ]
   }],
 
+  "web_accessible_resources": [
+    "css/*.css",
+    "js/*.js"
+  ],
+
   "permissions": [
-    "storage"
+    "tabs",
+    "storage",
+    "<all_urls>"
   ],
 
   "options_ui": {
