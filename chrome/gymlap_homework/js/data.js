@@ -9,16 +9,27 @@ var dropdown_abgabe_id = "#select_date";
 
 //Objekt dass alle Daten enthält die gerade von der Website geladen wurden
 var global_loaded_values = {
+  teacher: "",
   type: "",
   faecher: {
     unterstufe: [],
     q11: [],
     q12: []
   },
-  stufen: [],
+  klassen: {
+    unterstufe: [],
+    oberstufe: []
+  },
+  stufen: {
+
+  },
   kurse: {
-    q11: [],
-    q12: []
+    q11: {
+
+    },
+    q12: {
+
+    }
   }
 }
 
@@ -61,6 +72,18 @@ var oberstufe_kurse = {
   }
 };
 
+//DEBUG
+global_loaded_values.teacher = "WiM";
+global_loaded_values.type = "multiple";
+global_loaded_values.faecher = faecher;
+global_loaded_values.klassen.unterstufe = unterstufe;
+global_loaded_values.klassen.oberstufe = oberstufe;
+global_loaded_values.stufen["Deutsch"] = unterstufe_stufen;
+global_loaded_values.stufen["Englisch"] = ["b", "c"];
+global_loaded_values.stufen["Mathe"] = ["a", "b", "d"];
+global_loaded_values.kurse = oberstufe_kurse;
+
+
 
 //TODO Make Data class
 
@@ -69,11 +92,8 @@ function kursToFach(kl, ku) {
   var arr_names = [];
   var result = "FACH_NOT_FOUND";
 
-  if (kl == "11") {
-    arr_kurse = oberstufe_kurse.q11;
-  } else if (kl == "12") {
-    arr_kurse = oberstufe_kurse.q12;
-  }
+  arr_kurse = oberstufe_kurse["q" + kl];
+
   arr_names = Object.getOwnPropertyNames(arr_kurse);
 
   for (var i = 0; i < arr_names.length; i++) {
@@ -91,30 +111,31 @@ function getFaecher(klasse) {
   var f = [];
 
   if (klasse == "11") {
-    f = faecher.q11;
+    f = global_loaded_values.faecher.q11;
   } else if (klasse == "12") {
-    f = faecher.q12;
+    f = global_loaded_values.faecher.q12;
   } else {
-    f = faecher.unterstufe;
+    f = global_loaded_values.faecher.unterstufe;
   }
 
   return f;
 }
 
 
-function loadKurse(klasse, fach) {
+function loadKurse(klasse, fach, bAll) {
   var kurse = [];
 
-  if (fach == undefined) {
-    if (klasse == "11") kurse = oberstufe_kurse.q11;
-    else if (klasse == "12") kurse = oberstufe_kurse.q12;
+  if (bAll) {
+    //Alle kurse für ein fach zurückgeben
+    kurse = oberstufe_kurse.q["q" + klasse][fach];
+    kurse = kurse != undefined ? kurse : []; // Falls Fach nicht vorhanden -> leeres array
   } else {
-    if (klasse == "11") {
-      kurse = oberstufe_kurse.q11[fach];
-      kurse = kurse != undefined ? kurse : []; // Falls Fach nicht vorhanden ist es leer
-    } else if (klasse == "12") {
-      kurse = oberstufe_kurse.q12[fach];
-      kurse = kurse != undefined ? kurse : []; // Falls Fach nicht vorhanden ist es leer
+    //Nur die gerade geladenen kurse für ein fach zurückgeben
+    for (var i = 0; i < global_loaded_values.kurse["q" + klasse].length; i++) {
+      //Wenn ein Kurs zum gesuchten Fach passt dann zum array pushen
+      if (kursToFach(klasse, global_loaded_values.kurse["q" + klasse][i]) == fach) {
+        kurse.push(global_loaded_values.kurse["q" + klasse][i]);
+      }
     }
   }
 

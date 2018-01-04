@@ -16,46 +16,48 @@ $(document).ready(function() {
     Navigation.showLoader(true);
 
     $.get("http://api.lakinator.bplaced.net/request.php", {
-      fach: "" + data.fach,
-      klasse: "" + data.klasse,
-      stufe: "" + data.stufe,
-      type: "" + data.type,
-      date: "" + data.date,
-      text: "" + data.text,
+      fach: "" + encodeURIComponent(data.fach),
+      klasse: "" + encodeURIComponent(data.klasse),
+      stufe: "" + encodeURIComponent(data.stufe),
+      type: "" + encodeURIComponent(data.type),
+      date: "" + encodeURIComponent(data.date),
+      text: "" + encodeURIComponent(data.text),
       key: "917342346673"
     }, function(data, status, xhr) {
       if (status == "success") {
         console.log(data);
 
         if (data.success == "true") {
-          $("#homework_submit").append("<h5 class='center-align'>" + "- Daten erfolgreich gespeichert für " + data.data.klasse + " " + data.data.stufe + " in " + data.data.fach + " -" + "</h5>");
 
-          $("#homework_submit").append("<ul id='saved_listview' class='collapsible' data-collapsible='expandable'></ul>");
+          function reloadOnEdit() {
+            $("#homework_submit").empty();
 
-          var d = new Date(Number.parseInt(data.data.date));
-          var datestring = ("0" + d.getDate()).slice(-2) + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + d.getFullYear();
+            function onSuccess(data) {
+              $("#homework_submit").append("<h5 style='margin-bottom:30px' class='center-align'>" + "- Daten erfolgreich gespeichert für " + decodeURIComponent(data[0].klasse) + " " + decodeURIComponent(data[0].stufe) + " in " + decodeURIComponent(data[0].fach) + " -" + "</h5>");
 
-          var head = "";
-          if (data.data.type == "NEXT") {
-            head = "Hausaufgabe aufgegeben am <span style='color:red'>" + datestring + "</span>, Abgabe: Nächste Stunde";
-          } else if (data.data.type == "NEXT2") {
-            head = "Hausaufgabe aufgegeben am <span style='color:red'>" + datestring + "</span>, Abgabe: Übernächste Stunde";
-          } else if (data.data.type == "DATE") {
-            head = "Hausaufgabe/Notiz für <span style='color:red'>" + datestring + "</span>";
+              SQLHandler.generateSQLList("#homework_submit", data, true, function() {
+                reloadOnEdit(); //Daten aktualisieren
+              });
+
+              Navigation.showLoader(false);
+              Navigation.showSubmit(true);
+            }
+
+            function onError(error) {
+              $("#homework_submit").append("<h6>" + error + "</h6>");
+
+              Navigation.showLoader(false);
+              Navigation.showSubmit(true);
+            }
+
+            SQLHandler.getSQLData($(dropdown_fach_id).val(), $(dropdown_klasse_id).val(), $(dropdown_stufe_id).val(), onSuccess, onError);
+
+            //Updaten vom collapsible
+            $('.collapsible').collapsible();
           }
 
-          $("#saved_listview").append("<li> <div class='collapsible-header active'><h6>" + head + "</h6></div> <div class='collapsible-body'> <div class='row'>   <div class='col s10'><span><h6>" + data.data.text + "</h6></span></div> <div class='col s2'><a class='btn-floating waves-effect waves-light red'><i id='del-btn." + data.data.id + "' class='material-icons'>delete</i></a></div> </div> </div> </li>");
+          reloadOnEdit();
 
-          //Delete button
-          var v = "del-btn." + data.data.id;
-
-          document.getElementById(v).addEventListener("click", function(event) {
-            var innerID = event.target.id.split(".")[1];
-            deleteSQLData(innerID);
-          });
-
-          //Updaten vom collapsible
-          $('.collapsible').collapsible();
         } else {
           $("#homework_submit").append("<h5 class='center-align'>" + "- Datenspeicherung fehlgeschlagen -" + "</h5>");
           $("#homework_submit").append("<p class='center-align'>" + "- " + data.error + " -" + "</p>");
@@ -131,6 +133,10 @@ $(document).ready(function() {
     }
 
     var d_text = $("#textarea1").val();
+    if (d_text == "") {
+      Navigation.showMessage("Kein Text angegeben!");
+      return;
+    }
 
     // !Debug!
     //var d_array = ["Fach: " + d_fach, "Klasse: " + d_klasse, "Stufe/Kurs: " + d_stufe, "Typ: " + d_type, "Timestamp/Datum: " + d_date, "Text: " + d_text];
@@ -200,21 +206,20 @@ $(document).ready(function() {
     var st = $(dropdown_stufe_id).val();
 
     if ($(homework_view).css("display") == "block") {
-      getSQLData(fa, kl, st);
+      $("#booklist-link").click(); //Daten aktualisieren
     }
 
     if (isOb) {
       //Oberstufe ist ausgewählt
-      if (kl == "11") {
-        updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("11", fa));
-      } else if (kl == "12") {
-        updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("12", fa));
+      if (kl == "11" || kl == "12") {
+        updateDropdown(dropdown_stufe_id, "Kurs", true, global_loaded_values.kurse["q" + kl][fa]);
       } else {
         //Keine Klasse ausgewählt -> Kurs Dropdown wird leer gemacht
         updateDropdown(dropdown_stufe_id, "Kurs", true, []);
       }
     } else {
       //Unterstufe ist ausgewählt
+      updateDropdown(dropdown_stufe_id, "Stufe", true, global_loaded_values.stufen[fa]);
     }
 
   });
@@ -230,22 +235,30 @@ $(document).ready(function() {
     var st = $(dropdown_stufe_id).val();
 
     if ($(homework_view).css("display") == "block") {
-      getSQLData(null, "11", null);
+      $("#booklist-link").click(); //Daten aktualisieren
     }
 
-    if (isOb) {
-      //Oberstufe ist ausgewählt
-      //Alle Dropdowns updaten
-      updateDropdown(dropdown_fach_id, "Fach", true, []);
-      updateDropdown(dropdown_klasse_id, "Klasse", true, oberstufe);
-      updateDropdown(dropdown_stufe_id, "Kurs", true, []);
-    } else {
-      //Unterstufe ist ausgewählt
-      //Alle Dropdowns updaten
-      updateDropdown(dropdown_fach_id, "Fach", true, getFaecher("5")); //TODO: replace with response.klasse -> global_loaded_values
-      updateDropdown(dropdown_klasse_id, "Klasse", true, unterstufe);
-      updateDropdown(dropdown_stufe_id, "Stufe", true, unterstufe_stufen);
+    if (global_loaded_values.type == "single") {
+      //So lassen wie es war
+      updateCheckbox(checkbox_oberstufe_id, (!isOb));
+    } else if (global_loaded_values.type == "multiple") {
+      if (isOb) {
+        //Oberstufe ist ausgewählt
+        //Alle Dropdowns updaten
+        updateDropdown(dropdown_fach_id, "Fach", true, []);
+        updateDropdown(dropdown_klasse_id, "Klasse", true, global_loaded_values.klassen.oberstufe);
+        updateDropdown(dropdown_stufe_id, "Kurs", true, []);
+      } else {
+        //Unterstufe ist ausgewählt
+        //Alle Dropdowns updaten
+        updateDropdown(dropdown_fach_id, "Fach", true, global_loaded_values.faecher.unterstufe);
+        updateDropdown(dropdown_klasse_id, "Klasse", true, global_loaded_values.klassen.unterstufe);
+        updateDropdown(dropdown_stufe_id, "Stufe", true, []);
+      }
+    } else if (global_loaded_values.type == "error") {
+      
     }
+
   });
 
   //
@@ -259,24 +272,17 @@ $(document).ready(function() {
     var st = $(dropdown_stufe_id).val();
 
     //Anhand der gewählten Klasse alles updaten
-    if (kl == "11") {
+    if (kl == "11" || kl == "12") {
       //Checkbox ändern
       updateCheckbox(checkbox_oberstufe_id, true);
-      //Kurse zum gewählten Fach suchen und updaten
-      updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("11", fa));
-      updateDropdown(dropdown_fach_id, "Fach", true, getFaecher("11")); // Updaten der jeweiligen Fächer
-    } else if (kl == "12") {
-      //Checkbox ändern
-      updateCheckbox(checkbox_oberstufe_id, true);
-      //Kurse zum gewählten Fach suchen und updaten
-      updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("12", fa));
-      updateDropdown(dropdown_fach_id, "Fach", true, getFaecher("12")); // Updaten der jeweiligen Fächer
+      updateDropdown(dropdown_fach_id, "Fach", true, global_loaded_values.faecher["q" + kl]); // Updaten der jeweiligen Fächer
+      if (fa != null) updateDropdown(dropdown_stufe_id, "Kurs", true, global_loaded_values.kurse["q" + kl][fa]); //Kurse zum gewählten Fach suchen und updaten
     } else {
       //nix
     }
 
     if ($(homework_view).css("display") == "block") {
-      getSQLData(fa, kl, st);
+      $("#booklist-link").click(); //Daten aktualisieren
     }
   });
 
@@ -291,7 +297,7 @@ $(document).ready(function() {
     var st = $(this).val();
 
     if ($(homework_view).css("display") == "block") {
-      getSQLData(fa, kl, st);
+      $("#booklist-link").click(); //Daten aktualisieren
     }
   });
 
@@ -330,7 +336,20 @@ $(document).ready(function() {
     Navigation.showChooseForm(true);
     Navigation.showView(true);
 
-    getSQLData($(dropdown_fach_id).val(), $(dropdown_klasse_id).val(), $(dropdown_stufe_id).val());
+    $("#homework_view").empty();
+
+    function onSuccess(data) {
+      SQLHandler.generateSQLList("#homework_view", data, false, function() {
+        $("#booklist-link").click(); //Daten aktualisieren
+      });
+    }
+
+    function onError(error) {
+      $("#homework_view").append("<h6>" + error + "</h6>");
+    }
+
+    SQLHandler.getSQLData($(dropdown_fach_id).val(), $(dropdown_klasse_id).val(), $(dropdown_stufe_id).val(), onSuccess, onError);
+
   });
 
   $("#fullscreen-link").on("click", function() {
@@ -349,6 +368,8 @@ $(document).ready(function() {
   });
 
 });
+
+
 
 function updateCheckbox(boxid, value) {
   var $checkbox = $(boxid);
@@ -380,95 +401,6 @@ function updateDropdown(dropdownid, active, disabled, array) {
   // trigger event
   $selectDropdown.trigger("contentChanged");
 }
-
-
-function getSQLData(fach, klasse, stufe) {
-
-  Navigation.showLoader(true);
-
-  $.get("http://api.lakinator.bplaced.net/request.php", {
-    fach: "" + fach,
-    klasse: "" + klasse,
-    stufe: "" + stufe,
-    key: "917342346673"
-  }, function(data, status, xhr) {
-    if (status == "success") {
-      console.log(data);
-
-      $("#homework_view").empty();
-
-      if (data.success == "true") {
-
-        if (data.data.length == 0) {
-          $("#homework_view").append("<h6>Nichts gefunden</h6>");
-        } else {
-          $("#homework_view").append("<ul id='homework_listview' class='collapsible' data-collapsible='expandable'></ul>");
-          for (var i = 0; i < data.data.length; i++) {
-            var d = new Date(Number.parseInt(data.data[i].date));
-            var datestring = ("0" + d.getDate()).slice(-2) + "." + ("0" + (d.getMonth() + 1)).slice(-2) + "." + d.getFullYear();
-
-            var head = "";
-            if (data.data[i].type == "NEXT") {
-              head = "Hausaufgabe aufgegeben am <span style='color:red'>" + datestring + "</span>, Abgabe: Nächste Stunde";
-            } else if (data.data[i].type == "NEXT2") {
-              head = "Hausaufgabe aufgegeben am <span style='color:red'>" + datestring + "</span>, Abgabe: Übernächste Stunde";
-            } else if (data.data[i].type == "DATE") {
-              head = "Hausaufgabe/Notiz für <span style='color:red'>" + datestring + "</span>";
-            }
-
-            $("#homework_listview").append("<li> <div class='collapsible-header'><h6>" + head + "</h6></div> <div class='collapsible-body'> <div class='row'>   <div class='col s10'><span><h6>" + data.data[i].text + "</h6></span></div> <div class='col s2'><a class='btn-floating waves-effect waves-light red'><i id='del-btn." + data.data[i].id + "' class='material-icons'>delete</i></a></div> </div> </div> </li>");
-
-            //Delete button
-            var v = "del-btn." + data.data[i].id;
-
-            document.getElementById(v).addEventListener("click", function(event) {
-              var innerID = event.target.id.split(".")[1];
-              deleteSQLData(innerID);
-            });
-          }
-
-          //Updaten vom collapsible
-          $('.collapsible').collapsible();
-        }
-
-      } else {
-        $("#homework_view").append("<h6>Ein Fehler ist aufgetreten</h6>");
-      }
-
-    } else {
-      //Connection Error
-      $("#homework_view").append("<h6>Verbindung fehlgeschlagen</h6>");
-    }
-
-    Navigation.showLoader(false);
-  });
-}
-
-
-function deleteSQLData(sql_id) {
-  Navigation.showLoader(true);
-
-  $.get("http://api.lakinator.bplaced.net/request.php", {
-    id: "" + sql_id,
-    key: "917342346673"
-  }, function(data, status, xhr) {
-    console.log(data);
-
-
-    Navigation.showLoader(false);
-    if (data.success == "true") {
-      $("#booklist-link").click(); //Daten aktualisieren
-      Navigation.showMessage("Eintrag erfolgreich gelöscht");
-    } else {
-      Navigation.showMessage("Fehler beim löschen");
-    }
-
-  });
-
-}
-
-
-
 
 
 

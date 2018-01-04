@@ -21,6 +21,7 @@ chrome.runtime.onMessage.addListener(
           var oberstufe = false;
           var klasse = "";
           var kurs = "";
+          var lehrer = "";
 
           //Klasse: $(".hiddenBox .foo table tbody tr:eq(0) td:eq(2)")
           //Lehrer: $(".hiddenBox .foo table tbody tr:eq(1) td:eq(2)")
@@ -42,8 +43,12 @@ chrome.runtime.onMessage.addListener(
           if (!oberstufe) var kurs = klasseFull.replace(/[0-9]/g, '');
           else kurs = "1e4";
 
+          //Lehrer
+          lehrer = $(".hiddenBox .foo table tbody tr:eq(1) td:eq(2)").text();
+
           //Response senden
           sendResponse({
+            lehrer: lehrer,
             status: status,
             fach: fach,
             oberstufe: oberstufe,
@@ -53,6 +58,7 @@ chrome.runtime.onMessage.addListener(
 
         } else if (multiple_class_pattern.test(window.location.href)) {
           status = "multiple";
+          var lehrer = "";
           var faecher = {
             unterstufe: [],
             q11: [],
@@ -62,16 +68,50 @@ chrome.runtime.onMessage.addListener(
             unterstufe: [],
             oberstufe: []
           };
-          var stufen = [];
-          var kurse = {
-            q11: [],
-            q12: []
+          var stufen = {
+
           };
+          var kurse = {
+            q11: {
+
+            },
+            q12: {
+
+            }
+          };
+
+          /** Debug test
+           var faecher = {
+             unterstufe: ["Deutsch", "Englisch"],
+             q11: ["Physik", "Englisch"],
+             q12: []
+           };
+           var klassen = {
+             unterstufe: ["9", "10"],
+             oberstufe: ["11"]
+           };
+           var stufen = {
+             Deutsch: ["a", "c"],
+             Englisch: ["b", "c", "d"]
+           };
+           var kurse = {
+             q11: {
+               Physik: ["1ph1"],
+               Englisch: ["1e1", "1e4"]
+             },
+             q12: {
+
+             }
+           };
+           */
 
           //TODO Daten von der Seite holen
 
+          //For Schleife über alle container und dann daten rauslesen!
+
           //Response senden
           sendResponse({
+            lehrer: lehrer,
             status: status,
             faecher: faecher,
             klassen: klassen,
