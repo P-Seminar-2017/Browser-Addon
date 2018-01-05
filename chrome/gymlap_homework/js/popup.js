@@ -219,7 +219,7 @@ $(document).ready(function() {
       }
     } else {
       //Unterstufe ist ausgewählt
-      updateDropdown(dropdown_stufe_id, "Stufe", true, global_loaded_values.stufen[fa]);
+      updateDropdown(dropdown_stufe_id, "Stufe", true, global_loaded_values.stufen[fa] != undefined ? global_loaded_values.stufen[fa] : unterstufe_stufen);
     }
 
   });
