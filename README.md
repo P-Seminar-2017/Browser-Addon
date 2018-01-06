@@ -10,6 +10,6 @@
 
 ## Image Showcase
 
-![Overview Image](https://image.prntscr.com/image/HiRhWz2GTHyVu0foqUFZhw.png)
+![Overview Image](https://image.prntscr.com/image/u5aMrtciSP2KQOT4Lyfhyw.png)
 
-![Calendar View](https://image.prntscr.com/image/013T0xNMRh2OkwU-qUQ8iA.png)
+![Edit View](https://image.prntscr.com/image/PqxiHP7UTpOrDNlFBafBUA.png)
