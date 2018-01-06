@@ -6,7 +6,7 @@
 
 ## Gif Showcase
 
-![Gif Showcase](https://media.giphy.com/media/xUOxfgLCkFEiaROMtW/giphy.gif)
+![Gif Showcase](https://media.giphy.com/media/3oFzmomIIw5d3aWMW4/giphy.gif)
 
 ## Image Showcase
 
