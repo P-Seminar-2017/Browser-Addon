@@ -72,18 +72,6 @@ var oberstufe_kurse = {
   }
 };
 
-//DEBUG
-global_loaded_values.teacher = "WiM";
-global_loaded_values.type = "multiple";
-global_loaded_values.faecher = faecher;
-global_loaded_values.klassen.unterstufe = unterstufe;
-global_loaded_values.klassen.oberstufe = oberstufe;
-global_loaded_values.stufen["Deutsch"] = unterstufe_stufen;
-global_loaded_values.stufen["Englisch"] = ["b", "c"];
-global_loaded_values.stufen["Mathe"] = ["a", "b", "d"];
-global_loaded_values.kurse = oberstufe_kurse;
-
-
 
 //TODO Make Data class
 

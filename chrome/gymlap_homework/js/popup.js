@@ -256,7 +256,7 @@ $(document).ready(function() {
         updateDropdown(dropdown_stufe_id, "Stufe", true, []);
       }
     } else if (global_loaded_values.type == "error") {
-      
+
     }
 
   });
@@ -357,6 +357,13 @@ $(document).ready(function() {
       url: "popup.html"
     });
     window.close(); //Sicherheitshalber
+
+    //Variablen für fullscreen modus speichern
+    chrome.storage.sync.set({
+      fullscreen: true,
+      fullscreen_data: global_loaded_values
+    }, function() {});
+
   });
 
   $("#settings-link").on("click", function() {

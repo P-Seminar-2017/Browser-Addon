@@ -80,34 +80,33 @@ chrome.runtime.onMessage.addListener(
             }
           };
 
-          /** Debug test
-           var faecher = {
-             unterstufe: ["Deutsch", "Englisch"],
-             q11: ["Physik", "Englisch"],
-             q12: []
-           };
-           var klassen = {
-             unterstufe: ["9", "10"],
-             oberstufe: ["11"]
-           };
-           var stufen = {
-             Deutsch: ["a", "c"],
-             Englisch: ["b", "c", "d"]
-           };
-           var kurse = {
-             q11: {
-               Physik: ["1ph1"],
-               Englisch: ["1e1", "1e4"]
-             },
-             q12: {
+          /*  //Debug test
+             var faecher = {
+               unterstufe: ["Deutsch", "Englisch"],
+               q11: ["Physik", "Englisch"],
+               q12: []
+             };
+             var klassen = {
+               unterstufe: ["9", "10"],
+               oberstufe: ["11"]
+             };
+             var stufen = {
+               Deutsch: ["a", "c"],
+               Englisch: ["b", "c", "d"]
+             };
+             var kurse = {
+               q11: {
+                 Physik: ["1ph1"],
+                 Englisch: ["1e1", "1e4"]
+               },
+               q12: {
 
-             }
-           };
-           */
+               }
+             };*/
 
           //TODO Daten von der Seite holen
 
-          //For Schleife über alle container und dann daten rauslesen!
+          //For-Schleife über alle container und dann daten rauslesen!
 
           //Response senden
           sendResponse({
