@@ -41,6 +41,30 @@ var faecher = {
   q11: ["Deutsch", "Englisch", "Mathe", "Physik", "Informatik", "Geschichte", "Biologie", "Geographie", "Wirtschaft", "Französisch", "Sozialkunde", "Chemie", "Italienisch", "Latein", "Katholisch", "Evangelisch", "Ethik"],
   q12: ["Deutsch", "Englisch", "Mathe", "Physik", "Informatik"]
 }
+var stufen = {
+  Biologie: ["a", "b", "c", "d"],
+  Chemie: ["a", "b", "c", "d"],
+  Deutsch: ["a", "b", "c", "d"],
+  Englisch: ["a", "b", "c", "d"],
+  Französisch: ["a", "b", "c", "d"],
+  Geographie: ["a", "b", "c", "d"],
+  Geschichte: ["a", "b", "c", "d"],
+  Informatik: ["a", "b", "c", "d"],
+  Italienisch: ["a", "b", "c", "d"],
+  Kunst: ["a", "b", "c", "d"],
+  Latein: ["a", "b", "c", "d"],
+  Mathe: ["a", "b", "c", "d"],
+  Musik: ["a", "b", "c", "d"],
+  Physik: ["a", "b", "c", "d"],
+  Katholisch: ["a", "b", "c", "d"],
+  Evangelisch: ["a", "b", "c", "d"],
+  Ethik: ["a", "b", "c", "d"],
+  Sozialkunde: ["a", "b", "c", "d"],
+  Spanisch: ["a", "b", "c", "d"],
+  Sport: ["a", "b", "c", "d"],
+  Wirtschaft: ["a", "b", "c", "d"]
+}
+
 var unterstufe = ["5", "6", "7", "8", "9", "10"];
 var unterstufe_stufen = ["a", "b", "c", "d"];
 var oberstufe = ["11", "12"];

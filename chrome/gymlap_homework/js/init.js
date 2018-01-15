@@ -76,8 +76,13 @@ function initialize() {
             });
 
           } else {
-            //DEBUG
-            //global_loaded_values.type = "multiple";
+            //DEBUG TODO
+            global_loaded_values.type = "multiple";
+            global_loaded_values.faecher = faecher;
+            global_loaded_values.klassen.unterstufe = unterstufe;
+            global_loaded_values.klassen.oberstufe = oberstufe;
+            global_loaded_values.stufen = stufen;
+            global_loaded_values.kurse = oberstufe_kurse;
           }
         }
 
@@ -111,9 +116,9 @@ function initialize() {
         } else if (global_loaded_values.type == "error") {
           //Standard Initialisierung
           updateCheckbox(checkbox_oberstufe_id, false);
-          updateDropdown(dropdown_fach_id, "Fach", true, faecher.unterstufe);
-          updateDropdown(dropdown_klasse_id, "Klasse", true, unterstufe);
-          updateDropdown(dropdown_stufe_id, "Stufe", true, unterstufe_stufen);
+          updateDropdown(dropdown_fach_id, "Fach", true, global_loaded_values.faecher.unterstufe);
+          updateDropdown(dropdown_klasse_id, "Klasse", true, global_loaded_values.klassen.unterstufe);
+          updateDropdown(dropdown_stufe_id, "Stufe", true, global_loaded_values.stufen);
         }
 
       });
