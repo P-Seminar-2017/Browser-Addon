@@ -6,102 +6,71 @@ $(document).ready(function() {
    *
    */
 
-  chrome.storage.sync.get({
-    //Default
-    loadFromWebsite: false,
-    manualTime: false,
-    loadingTime: false
-  }, function(storage) {
-    preload(storage.loadFromWebsite, storage.loadingTime, storage.manualTime);
-  });
-
-  function preload(loadFromWebsite, loadingTime, manualTime) {
-    $("#loader").hide();
-    $("#main").hide();
-    $("#after-submit").hide();
-
-    loadPageData(loadFromWebsite);
-
-    if (manualTime) {
-      //Standard im HTML
-    } else {
-      //Timepicker entfernen
-      $("#form_timepicker1").hide();
-      $("#form_datepicker1").removeClass("s6").addClass("s12");
-    }
-
-    if (loadingTime) {
-      $("#loader").delay(500).fadeIn().delay(1000).fadeOut();
-      $("#main").delay(2000).fadeIn();
-    } else {
-      $("#main").fadeIn();
-    }
-  }
-
-  function loadPageData(loadFromWebsite) {
-    chrome.tabs.query({
-      active: true,
-      currentWindow: true
-    }, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        type: "load"
-      }, function(response) {
-        //Check ob Response valid ist
-        if (!response) response = {
-          success: false
-        };
-
-        if (response.success && loadFromWebsite) {
-          //Website angepasste Initialisierung
-          updateCheckbox(checkbox_oberstufe_id, response.oberstufe);
-          if (response.oberstufe) {
-            //Oberstufe
-            updateDropdown(dropdown_fach_id, kursToFach(response.klasse, response.kurs), false, loadFaecher(response.klasse));
-            updateDropdown(dropdown_klasse_id, response.klasse, false, oberstufe);
-            updateDropdown(dropdown_stufe_id, response.kurs, false, []);
-          } else {
-            //Unterstufe
-            updateDropdown(dropdown_fach_id, "Fach", true, loadFaecher("5")); //TODO: replace "5" with response.klasse
-            updateDropdown(dropdown_klasse_id, response.klasse, false, unterstufe);
-            updateDropdown(dropdown_stufe_id, "Stufe", true, unterstufe_stufen);
-          }
-
-        } else {
-          //Standard Initialisierung
-          updateCheckbox(checkbox_oberstufe_id, false);
-          updateDropdown(dropdown_fach_id, "Fach", true, faecher.unterstufe);
-          updateDropdown(dropdown_klasse_id, "Klasse", true, unterstufe);
-          updateDropdown(dropdown_stufe_id, "Stufe", true, unterstufe_stufen);
-        }
-
-      });
-    });
-  }
+  initialize(); //init.js
 
   function finish(data) {
-    $("#loader").hide();
-    $("#main").hide();
-
-    $("#loader").delay(500).fadeIn();
+    Navigation.showEdit(false);
+    Navigation.showView(false);
+    Navigation.showChooseForm(false);
+    Navigation.showHeadline(false);
+    Navigation.showLoader(true);
 
     $.get("http://api.lakinator.bplaced.net/request.php", {
-      fach: "" + data.fach,
-      klasse: "" + data.klasse,
-      stufe: "" + data.stufe,
-      date: "" + data.date,
-      text: "" + data.text
+      fach: "" + encodeURIComponent(data.fach),
+      klasse: "" + encodeURIComponent(data.klasse),
+      stufe: "" + encodeURIComponent(data.stufe),
+      type: "" + encodeURIComponent(data.type),
+      date: "" + encodeURIComponent(data.date),
+      text: "" + encodeURIComponent(data.text),
+      key: "917342346673"
     }, function(data, status, xhr) {
       if (status == "success") {
-        $("#after-submit").append("<h5 class='center-align'>" + "- Daten erfolgreich gespeichert -" + "</h5>");
-        $("#after-submit").append("<h6 class='center-align'>Response: </br>" + data + "</h6>");
+        console.log(data);
 
-        $("#loader").delay(500).fadeOut();
-        $("#after-submit").delay(1000).fadeIn();
+        if (data.success == "true") {
+
+          function reloadOnEdit() {
+            $("#homework_submit").empty();
+
+            function onSuccess(data) {
+              $("#homework_submit").append("<h5 style='margin-bottom:30px' class='center-align'>" + "- Daten erfolgreich gespeichert für " + decodeURIComponent(data[0].klasse) + " " + decodeURIComponent(data[0].stufe) + " in " + decodeURIComponent(data[0].fach) + " -" + "</h5>");
+
+              SQLHandler.generateSQLList("#homework_submit", data, true, function() {
+                reloadOnEdit(); //Daten aktualisieren
+              });
+
+              Navigation.showLoader(false);
+              Navigation.showSubmit(true);
+            }
+
+            function onError(error) {
+              $("#homework_submit").append("<h6>" + error + "</h6>");
+
+              Navigation.showLoader(false);
+              Navigation.showSubmit(true);
+            }
+
+            SQLHandler.getSQLData($(dropdown_fach_id).val(), $(dropdown_klasse_id).val(), $(dropdown_stufe_id).val(), onSuccess, onError);
+
+            //Updaten vom collapsible
+            $('.collapsible').collapsible();
+          }
+
+          reloadOnEdit();
+
+        } else {
+          $("#homework_submit").append("<h5 class='center-align'>" + "- Datenspeicherung fehlgeschlagen -" + "</h5>");
+          $("#homework_submit").append("<p class='center-align'>" + "- " + data.error + " -" + "</p>");
+        }
+
+        Navigation.showLoader(false);
+        Navigation.showSubmit(true);
       } else {
-        $("#after-submit").append("<h5 class='center-align'>" + "- Error: " + status + " -" + "</h5>");
+        //Connection Error
+        $("#homework_submit").append("<h5 class='center-align'>" + "- Error: " + status + " -" + "</h5>");
 
-        $("#loader").delay(500).fadeOut();
-        $("#after-submit").delay(1000).fadeIn();
+        Navigation.showLoader(false);
+        Navigation.showSubmit(true);
       }
     });
 
@@ -127,36 +96,57 @@ $(document).ready(function() {
    *
    */
 
-  var btn = document.getElementById("submit-btn");
-  btn.addEventListener("click", function() {
-    //TODO Daten schicken (wohin?)
+  $("#submit-btn").on("click", function() {
+
+    //Data Validation für alle
 
     var d_fach = $(dropdown_fach_id).val();
+    if (d_fach == null) {
+      Navigation.showMessage("Fach nicht angegeben!");
+      return;
+    }
+
     var d_klasse = $(dropdown_klasse_id).val();
+    if (d_klasse == null) {
+      Navigation.showMessage("Klasse nicht angegeben!");
+      return;
+    }
+
     var d_stufe = $(dropdown_stufe_id).val();
+    if (d_stufe == null) {
+      Navigation.showMessage("Stufe nicht angegeben!");
+      return;
+    }
 
-    //var d_date = $('.datepicker').val();
-    var year = $('.datepicker').pickadate('picker').get('highlight', 'yyyy');
-    var month = $('.datepicker').pickadate('picker').get('highlight', 'mm');
-    month -= 1; //JS zählt Monate von 0 nach 11
-    var day = $('.datepicker').pickadate('picker').get('highlight', 'dd');
+    var d_type = $(dropdown_abgabe_id).val();
 
-    var temp_val = $("#timepicker1").val();
-    var hours = temp_val[0] + temp_val[1];
-    var minutes = temp_val[3] + temp_val[4];
+    if (d_type == "DATE") {
+      var year = $('.datepicker').pickadate('picker').get('highlight', 'yyyy');
+      var month = $('.datepicker').pickadate('picker').get('highlight', 'mm');
+      month -= 1; //JS zählt Monate von 0 nach 11
+      var day = $('.datepicker').pickadate('picker').get('highlight', 'dd');
 
-    var d_date = new Date(year, month, day, hours, minutes).getTime();
+      d_date = new Date(year, month, day, 8).getTime();
+
+    } else {
+      d_date = new Date().getTime();
+    }
 
     var d_text = $("#textarea1").val();
+    if (d_text == "") {
+      Navigation.showMessage("Kein Text angegeben!");
+      return;
+    }
 
     // !Debug!
-    // var d_array = ["Fach: " + d_fach, "Klasse: " + d_klasse, "Stufe/Kurs: " + d_stufe, "Abgabedatum: " + d_date, "Hausi: " + d_text];
-    // console.log(d_array);
+    //var d_array = ["Fach: " + d_fach, "Klasse: " + d_klasse, "Stufe/Kurs: " + d_stufe, "Typ: " + d_type, "Timestamp/Datum: " + d_date, "Text: " + d_text];
+    //console.log(d_array);
 
     finish({
       fach: d_fach,
       klasse: d_klasse,
       stufe: d_stufe,
+      type: d_type,
       date: d_date,
       text: d_text
     });
@@ -168,7 +158,7 @@ $(document).ready(function() {
    *
    */
 
-  var $datepicker = $('.datepicker').pickadate({
+  $('.datepicker').pickadate({
     selectMonths: true,
     selectYears: 6,
     today: 'Heute',
@@ -183,27 +173,7 @@ $(document).ready(function() {
     closeOnSelect: false
   });
 
-  var date_picker = $datepicker.pickadate('picker');
-  date_picker.set('select', new Date());
-
-  /*
-   *
-   * Timepicker
-   *
-   */
-
-  var $timepicker = $('.timepicker').pickatime({
-    default: 'now',
-    fromnow: 0,
-    twelvehour: false,
-    donetext: 'OK',
-    cleartext: 'Löschen',
-    canceltext: 'Zurück',
-    autoclose: false,
-    ampmclickable: true
-  });
-
-  $timepicker.val("16:00"); //Default value
+  $('.datepicker').pickadate('picker').set('select', new Date());
 
   /*
    *
@@ -217,41 +187,13 @@ $(document).ready(function() {
     $(this).material_select();
   });
 
-  //TODO Schuldaten anders laden und vervollständigen/anpassen
-  //http://www.utf8-zeichentabelle.de/
+  //Character counter
 
-  var faecher = {
-    unterstufe: ["Biologie", "Chemie", "Deutsch", "Englisch", "Franz\u00f6sisch",
-      "Geographie", "Geschichte", "Informatik", "Italienisch", "Kunst", "Latein",
-      "Mathe", "Musik", "Physik", "Religion", "Ethik", "Sozialkunde", "Spanisch", "Sport", "Wirtschaft"
-    ],
-    q11: ["Deutsch", "Englisch", "Mathe", "Physik", "Informatik"],
-    q12: ["Deutsch", "Englisch", "Mathe", "Physik", "Informatik"]
-  }
-  var unterstufe = ["5", "6", "7", "8", "9", "10"];
-  var unterstufe_stufen = ["a", "b", "c", "d"];
-  var oberstufe = ["11", "12"];
-  var oberstufe_kurse = {
-    q11: {
-      Deutsch: ["1d1", "1d2", "1d3", "1d4"],
-      Englisch: ["1e1", "1e2", "1e3", "1e4"],
-      Mathe: ["1m1", "1m2", "1m3", "1m4"],
-      Physik: ["1ph1", "1ph2"],
-      Informatik: ["1inf0"],
-      Sozialkunde: ["1sk1", "1sk2"]
-    },
-    q12: {
-      Deutsch: ["1d1", "1d2"],
-      Englisch: ["1e1", "1e2"],
-      Mathe: ["1m1", "1m2"],
-      Physik: ["1ph1", "1ph2"]
-    }
-  };
+  $("#textarea1").characterCounter();
 
-  var checkbox_oberstufe_id = "#oberstufe-box";
-  var dropdown_fach_id = "#select_fach";
-  var dropdown_klasse_id = "#select_klasse";
-  var dropdown_stufe_id = "#select_stufe";
+  //Collapsible
+
+  $('.collapsible').collapsible();
 
   //
   //Fach Dropdown
@@ -263,18 +205,21 @@ $(document).ready(function() {
     var kl = $(dropdown_klasse_id).val();
     var st = $(dropdown_stufe_id).val();
 
+    if ($(homework_view).css("display") == "block") {
+      $("#booklist-link").click(); //Daten aktualisieren
+    }
+
     if (isOb) {
       //Oberstufe ist ausgewählt
-      if (kl == "11") {
-        updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("11", fa));
-      } else if (kl == "12") {
-        updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("12", fa));
+      if (kl == "11" || kl == "12") {
+        updateDropdown(dropdown_stufe_id, "Kurs", true, global_loaded_values.kurse["q" + kl][fa]);
       } else {
         //Keine Klasse ausgewählt -> Kurs Dropdown wird leer gemacht
         updateDropdown(dropdown_stufe_id, "Kurs", true, []);
       }
     } else {
       //Unterstufe ist ausgewählt
+      updateDropdown(dropdown_stufe_id, "Stufe", true, global_loaded_values.stufen[fa]);
     }
 
   });
@@ -289,19 +234,31 @@ $(document).ready(function() {
     var kl = $(dropdown_klasse_id).val();
     var st = $(dropdown_stufe_id).val();
 
-    if (isOb) {
-      //Oberstufe ist ausgewählt
-      //Alle Dropdowns updaten
-      updateDropdown(dropdown_fach_id, "Fach", true, []);
-      updateDropdown(dropdown_klasse_id, "Klasse", true, oberstufe);
-      updateDropdown(dropdown_stufe_id, "Kurs", true, []);
-    } else {
-      //Unterstufe ist ausgewählt
-      //Alle Dropdowns updaten
-      updateDropdown(dropdown_fach_id, "Fach", true, loadFaecher("5")); //TODO: replace with response.klasse
-      updateDropdown(dropdown_klasse_id, "Klasse", true, unterstufe);
-      updateDropdown(dropdown_stufe_id, "Stufe", true, unterstufe_stufen);
+    if ($(homework_view).css("display") == "block") {
+      $("#booklist-link").click(); //Daten aktualisieren
     }
+
+    if (global_loaded_values.type == "single") {
+      //So lassen wie es war
+      updateCheckbox(checkbox_oberstufe_id, (!isOb));
+    } else if (global_loaded_values.type == "multiple") {
+      if (isOb) {
+        //Oberstufe ist ausgewählt
+        //Alle Dropdowns updaten
+        updateDropdown(dropdown_fach_id, "Fach", true, []);
+        updateDropdown(dropdown_klasse_id, "Klasse", true, global_loaded_values.klassen.oberstufe);
+        updateDropdown(dropdown_stufe_id, "Kurs", true, []);
+      } else {
+        //Unterstufe ist ausgewählt
+        //Alle Dropdowns updaten
+        updateDropdown(dropdown_fach_id, "Fach", true, global_loaded_values.faecher.unterstufe);
+        updateDropdown(dropdown_klasse_id, "Klasse", true, global_loaded_values.klassen.unterstufe);
+        updateDropdown(dropdown_stufe_id, "Stufe", true, []);
+      }
+    } else if (global_loaded_values.type == "error") {
+      
+    }
+
   });
 
   //
@@ -315,29 +272,92 @@ $(document).ready(function() {
     var st = $(dropdown_stufe_id).val();
 
     //Anhand der gewählten Klasse alles updaten
-    if (kl == "11") {
+    if (kl == "11" || kl == "12") {
       //Checkbox ändern
       updateCheckbox(checkbox_oberstufe_id, true);
-      //Kurse zum gewählten Fach suchen und updaten
-      updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("11", fa));
-      updateDropdown(dropdown_fach_id, "Fach", true, loadFaecher("11")); // Updaten der jeweiligen Fächer
-    } else if (kl == "12") {
-      //Checkbox ändern
-      updateCheckbox(checkbox_oberstufe_id, true);
-      //Kurse zum gewählten Fach suchen und updaten
-      updateDropdown(dropdown_stufe_id, "Kurs", true, loadKurse("12", fa));
-      updateDropdown(dropdown_fach_id, "Fach", true, loadFaecher("12")); // Updaten der jeweiligen Fächer
+      updateDropdown(dropdown_fach_id, "Fach", true, global_loaded_values.faecher["q" + kl]); // Updaten der jeweiligen Fächer
+      if (fa != null) updateDropdown(dropdown_stufe_id, "Kurs", true, global_loaded_values.kurse["q" + kl][fa]); //Kurse zum gewählten Fach suchen und updaten
     } else {
       //nix
     }
+
+    if ($(homework_view).css("display") == "block") {
+      $("#booklist-link").click(); //Daten aktualisieren
+    }
   });
 
+  //
+  //Stufe Dropdown
+  //
+
+  $(dropdown_stufe_id).on("change", function() {
+    var fa = $(dropdown_fach_id).val();
+    var isOb = $(checkbox_oberstufe_id).prop("checked");
+    var kl = $(dropdown_klasse_id).val();
+    var st = $(this).val();
+
+    if ($(homework_view).css("display") == "block") {
+      $("#booklist-link").click(); //Daten aktualisieren
+    }
+  });
+
+  //
+  //Date Dropdown
+  //
+
+  $(dropdown_abgabe_id).on("change", function() {
+
+    if ($(this).val() == "DATE") {
+      $("#datepicker1").prop("disabled", false);
+    } else {
+      $("#datepicker1").prop("disabled", true);
+    }
+
+  });
 
   /*
    *
-   * Options Page
+   * Navbar Buttons
    *
    */
+
+  $("#home-link").on("click", function() {
+    $("#headline").text("Hausaufgaben hier eintragen");
+    Navigation.showAll(false);
+    Navigation.showHeadline(true);
+    Navigation.showEdit(true);
+    Navigation.showChooseForm(true);
+  });
+
+  $("#booklist-link").on("click", function() {
+    $("#headline").text("Hausaufgaben hier ansehen");
+    Navigation.showAll(false);
+    Navigation.showHeadline(true);
+    Navigation.showChooseForm(true);
+    Navigation.showView(true);
+
+    $("#homework_view").empty();
+
+    function onSuccess(data) {
+      SQLHandler.generateSQLList("#homework_view", data, false, function() {
+        $("#booklist-link").click(); //Daten aktualisieren
+      });
+    }
+
+    function onError(error) {
+      $("#homework_view").append("<h6>" + error + "</h6>");
+    }
+
+    SQLHandler.getSQLData($(dropdown_fach_id).val(), $(dropdown_klasse_id).val(), $(dropdown_stufe_id).val(), onSuccess, onError);
+
+  });
+
+  $("#fullscreen-link").on("click", function() {
+    chrome.tabs.create({
+      url: "popup.html"
+    });
+    window.close(); //Sicherheitshalber
+  });
 
   $("#settings-link").on("click", function() {
     chrome.tabs.create({
@@ -347,68 +367,8 @@ $(document).ready(function() {
     //chrome.runtime.openOptionsPage();
   });
 
-
-
-
-  //Muss hier drin sein wegen lokalen Variablen
-  //TODO: Ändern
-  function kursToFach(kl, ku) {
-    var arr_kurse = [];
-    var arr_names = [];
-    var result = "FACH_NOT_FOUND";
-
-    if (kl == "11") {
-      arr_kurse = oberstufe_kurse.q11;
-    } else if (kl == "12") {
-      arr_kurse = oberstufe_kurse.q12;
-    }
-    arr_names = Object.getOwnPropertyNames(arr_kurse);
-
-    for (var i = 0; i < arr_names.length; i++) {
-      if (arr_kurse[arr_names[i]].includes(ku)) {
-        result = arr_names[i];
-        break;
-      }
-    }
-
-    return result;
-  }
-
-
-  function loadFaecher(klasse) {
-    var f = [];
-
-    if (klasse == "11") {
-      f = faecher.q11;
-    } else if (klasse == "12") {
-      f = faecher.q12;
-    } else {
-      f = faecher.unterstufe;
-    }
-
-    return f;
-  }
-
-
-  function loadKurse(klasse, fach) {
-    var kurse = [];
-
-    if (fach == undefined) {
-      if (klasse == "11") kurse = oberstufe_kurse.q11;
-      else if (klasse == "12") kurse = oberstufe_kurse.q12;
-    } else {
-      if (klasse == "11") {
-        kurse = oberstufe_kurse.q11[fach];
-        kurse = kurse != undefined ? kurse : []; // Falls Fach nicht vorhanden ist es leer
-      } else if (klasse == "12") {
-        kurse = oberstufe_kurse.q12[fach];
-        kurse = kurse != undefined ? kurse : []; // Falls Fach nicht vorhanden ist es leer
-      }
-    }
-
-    return kurse;
-  }
 });
+
 
 
 function updateCheckbox(boxid, value) {
@@ -427,7 +387,7 @@ function updateDropdown(dropdownid, active, disabled, array) {
   // add new value
   var value = active;
   var d = disabled ? "disabled" : "";
-  
+
   $selectDropdown.prop("disabled", array.length == 0);
 
   $selectDropdown.append($("<option " + d + " selected></option>").attr("value", value).text(value));
@@ -441,11 +401,6 @@ function updateDropdown(dropdownid, active, disabled, array) {
   // trigger event
   $selectDropdown.trigger("contentChanged");
 }
-
-
-
-
-
 
 
 

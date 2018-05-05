@@ -100,31 +100,31 @@ $(document).ready(function() {
 
     //Data Validation für alle
 
-    var d_fach = $(dropdown_fach_id).val();
+    let d_fach = $(dropdown_fach_id).val();
     if (d_fach == null) {
       Navigation.showMessage("Fach nicht angegeben!");
       return;
     }
 
-    var d_klasse = $(dropdown_klasse_id).val();
+    let d_klasse = $(dropdown_klasse_id).val();
     if (d_klasse == null) {
       Navigation.showMessage("Klasse nicht angegeben!");
       return;
     }
 
-    var d_stufe = $(dropdown_stufe_id).val();
+    let d_stufe = $(dropdown_stufe_id).val();
     if (d_stufe == null) {
       Navigation.showMessage("Stufe nicht angegeben!");
       return;
     }
 
-    var d_type = $(dropdown_abgabe_id).val();
+    let d_type = $(dropdown_abgabe_id).val();
 
     if (d_type == "DATE") {
-      var year = $('.datepicker').pickadate('picker').get('highlight', 'yyyy');
-      var month = $('.datepicker').pickadate('picker').get('highlight', 'mm');
+      let year = $('.datepicker').pickadate('picker').get('highlight', 'yyyy');
+      let month = $('.datepicker').pickadate('picker').get('highlight', 'mm');
       month -= 1; //JS zählt Monate von 0 nach 11
-      var day = $('.datepicker').pickadate('picker').get('highlight', 'dd');
+      let day = $('.datepicker').pickadate('picker').get('highlight', 'dd');
 
       d_date = new Date(year, month, day, 8).getTime();
 
@@ -132,14 +132,14 @@ $(document).ready(function() {
       d_date = new Date().getTime();
     }
 
-    var d_text = $("#textarea1").val();
+    let d_text = $("#textarea1").val();
     if (d_text == "") {
       Navigation.showMessage("Kein Text angegeben!");
       return;
     }
 
     // !Debug!
-    //var d_array = ["Fach: " + d_fach, "Klasse: " + d_klasse, "Stufe/Kurs: " + d_stufe, "Typ: " + d_type, "Timestamp/Datum: " + d_date, "Text: " + d_text];
+    //let d_array = ["Fach: " + d_fach, "Klasse: " + d_klasse, "Stufe/Kurs: " + d_stufe, "Typ: " + d_type, "Timestamp/Datum: " + d_date, "Text: " + d_text];
     //console.log(d_array);
 
     finish({
@@ -200,10 +200,10 @@ $(document).ready(function() {
   //
 
   $(dropdown_fach_id).on("change", function() {
-    var fa = $(this).val();
-    var isOb = $(checkbox_oberstufe_id).prop("checked");
-    var kl = $(dropdown_klasse_id).val();
-    var st = $(dropdown_stufe_id).val();
+    let fa = $(this).val();
+    let isOb = $(checkbox_oberstufe_id).prop("checked");
+    let kl = $(dropdown_klasse_id).val();
+    let st = $(dropdown_stufe_id).val();
 
     if ($(homework_view).css("display") == "block") {
       $("#booklist-link").click(); //Daten aktualisieren
@@ -229,10 +229,10 @@ $(document).ready(function() {
   //
 
   $(checkbox_oberstufe_id).on("change", function() {
-    var fa = $(dropdown_fach_id).val();
-    var isOb = $(this).prop("checked");
-    var kl = $(dropdown_klasse_id).val();
-    var st = $(dropdown_stufe_id).val();
+    let fa = $(dropdown_fach_id).val();
+    let isOb = $(this).prop("checked");
+    let kl = $(dropdown_klasse_id).val();
+    let st = $(dropdown_stufe_id).val();
 
     if ($(homework_view).css("display") == "block") {
       $("#booklist-link").click(); //Daten aktualisieren
@@ -266,10 +266,10 @@ $(document).ready(function() {
   //
 
   $(dropdown_klasse_id).on("change", function() {
-    var fa = $(dropdown_fach_id).val();
-    var isOb = $(checkbox_oberstufe_id).prop("checked");
-    var kl = $(this).val();
-    var st = $(dropdown_stufe_id).val();
+    let fa = $(dropdown_fach_id).val();
+    let isOb = $(checkbox_oberstufe_id).prop("checked");
+    let kl = $(this).val();
+    let st = $(dropdown_stufe_id).val();
 
     //Anhand der gewählten Klasse alles updaten
     if (kl == "11" || kl == "12") {
@@ -291,10 +291,10 @@ $(document).ready(function() {
   //
 
   $(dropdown_stufe_id).on("change", function() {
-    var fa = $(dropdown_fach_id).val();
-    var isOb = $(checkbox_oberstufe_id).prop("checked");
-    var kl = $(dropdown_klasse_id).val();
-    var st = $(this).val();
+    let fa = $(dropdown_fach_id).val();
+    let isOb = $(checkbox_oberstufe_id).prop("checked");
+    let kl = $(dropdown_klasse_id).val();
+    let st = $(this).val();
 
     if ($(homework_view).css("display") == "block") {
       $("#booklist-link").click(); //Daten aktualisieren
@@ -379,8 +379,8 @@ $(document).ready(function() {
 
 
 function updateCheckbox(boxid, value) {
-  var $checkbox = $(boxid);
-  var val = $checkbox.val();
+  let $checkbox = $(boxid);
+  let val = $checkbox.val();
 
   //Nur updaten wenn der Wert anders ist
   if (val != value) $checkbox.prop("checked", value);
@@ -389,16 +389,16 @@ function updateCheckbox(boxid, value) {
 
 function updateDropdown(dropdownid, active, disabled, array) {
   // clear contents
-  var $selectDropdown = $(dropdownid).empty().html(' ');
+  let $selectDropdown = $(dropdownid).empty().html(' ');
 
   // add new value
-  var value = active;
-  var d = disabled ? "disabled" : "";
+  let value = active;
+  let d = disabled ? "disabled" : "";
 
   $selectDropdown.prop("disabled", array.length == 0);
 
   $selectDropdown.append($("<option " + d + " selected></option>").attr("value", value).text(value));
-  for (var i = 0; i < array.length; i++) {
+  for (let i = 0; i < array.length; i++) {
     if (array[i] != active) {
       value = array[i];
       $selectDropdown.append($("<option></option>").attr("value", value).text(value));

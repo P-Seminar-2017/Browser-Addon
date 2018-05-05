@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
-  var box_loadFromWebsite_id = "#box-loadFromWebsite";
-  var label_loadFromWebsite_id = "#label-loadFromWebsite";
+  let box_loadFromWebsite_id = "#box-loadFromWebsite";
+  let label_loadFromWebsite_id = "#label-loadFromWebsite";
 
   //Laden
   chrome.storage.sync.get({
@@ -15,7 +15,7 @@ $(document).ready(function() {
 
 
   $(box_loadFromWebsite_id).on("change", function() {
-    var value = $(box_loadFromWebsite_id).prop("checked");
+    let value = $(box_loadFromWebsite_id).prop("checked");
 
     //Speichern
     chrome.storage.sync.set({
