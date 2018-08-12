@@ -4,6 +4,9 @@
 - Chrome: Working, version 1.1
 - Firefox: Mostly working, version 1.0.1
 
+Currently work in progress:
+- Key encryption (api)
+
 ## Gif Showcase
 
 ![Gif Showcase](https://media.giphy.com/media/3oFzmomIIw5d3aWMW4/giphy.gif)
