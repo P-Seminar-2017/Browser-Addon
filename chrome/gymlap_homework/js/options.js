@@ -26,7 +26,6 @@ $(document).ready(function () {
     if (!storage.disableHelp) $('.tap-target').tapTarget('open');
   });
 
-
   $(box_loadFromWebsite_id).on("change", function () {
     let value = $(box_loadFromWebsite_id).prop("checked");
 
@@ -56,7 +55,7 @@ $(document).ready(function () {
   $('.modal').modal();
   $(input_fach_id).val("");
 
-  $(create_btn_id).click(function() {
+  $(create_btn_id).click(function () {
     let value = $(input_fach_id).val();
     active_fach = value;
     $(input_fach_id).val("");
