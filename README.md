@@ -1,8 +1,8 @@
 # Browser-Extension
 
-- School data not fully up to date
-- Chrome: Working, not finished
-- Firefox: Mostly working, but sending and receiving data doesn't work
+- School data is now cloud storage based now editable in settings
+- Chrome: Working, version 1.1
+- Firefox: Mostly working, version 1.0.1
 
 ## Gif Showcase
 
