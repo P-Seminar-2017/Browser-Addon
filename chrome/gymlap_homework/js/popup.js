@@ -211,7 +211,7 @@ $(document).ready(function() {
 
     if (isOb) {
       //Oberstufe ist ausgewählt
-      if (kl == "11" || kl == "12") {
+      if (oberstufe.includes(""+kl)) {
         updateDropdown(dropdown_stufe_id, "Kurs", true, global_loaded_values.kurse["q" + kl][fa]);
       } else {
         //Keine Klasse ausgewählt -> Kurs Dropdown wird leer gemacht
@@ -272,7 +272,7 @@ $(document).ready(function() {
     let st = $(dropdown_stufe_id).val();
 
     //Anhand der gewählten Klasse alles updaten
-    if (kl == "11" || kl == "12") {
+    if (oberstufe.includes(""+kl)) {
       //Checkbox ändern
       updateCheckbox(checkbox_oberstufe_id, true);
       updateDropdown(dropdown_fach_id, "Fach", true, global_loaded_values.faecher["q" + kl]); // Updaten der jeweiligen Fächer
