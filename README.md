@@ -1,6 +1,6 @@
 # Browser-Extension
 
-- School data is now cloud storage based now editable in settings
+- School data is now cloud storage based and editable in settings
 - Chrome: Working, version 1.1
 - Firefox: Working, version 1.1
 
