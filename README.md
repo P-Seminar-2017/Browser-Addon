@@ -2,7 +2,7 @@
 
 - School data is now cloud storage based now editable in settings
 - Chrome: Working, version 1.1
-- Firefox: Mostly working, version 1.0.1
+- Firefox: Working, version 1.1
 
 Currently work in progress:
 - Key encryption (api)
