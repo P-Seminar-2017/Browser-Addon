@@ -12,25 +12,91 @@
 <body>
   <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/materialize.js"></script>
+  <script type="text/javascript" src="js/navigation.js"></script>
+  <script type="text/javascript" src="js/sql.js"></script>
   <script type="text/javascript" src="js/options.js"></script>
 
   <nav>
     <div class="nav-wrapper teal lighten-2">
       <a href="#" class="brand-logo center">Gymlap Hausi Planer</a>
     </div>
+    <div id="loader" class="progress">
+      <div class="indeterminate"></div>
+    </div>
   </nav>
 
-  <main id="main">
+  <main id="main" style="margin-bottom: 10%">
     <div class="container">
-      <h4>Settings</h4>
-      <div class="row">
-        <p class="col s12">
-          <input type="checkbox" id="box-loadFromWebsite" />
-          <label id="label-loadFromWebsite" for="box-loadFromWebsite">Daten von der WebUntis Website laden</label>
-        </p>
+      <h4>Einstellungen</h4>
+
+      <div id="staticSettings">
+        <div class="row">
+          <p class="col s12">
+            <input type="checkbox" id="box-loadFromWebsite" />
+            <label id="label-loadFromWebsite" for="box-loadFromWebsite">Daten von der WebUntis Website laden</label>
+          </p>
+        </div>
+        <div class="row">
+          <p class="col s12">
+            <input type="checkbox" id="box-disableHelp" />
+            <label id="label-disableHelp" for="box-disableHelp">Hilfen deaktivieren</label>
+          </p>
+        </div>
+      </div>
+
+      <h4>Schuldaten</h4>
+
+      <div id="schoolDataSettings"></div>
+
+    </div>
+
+    <div class='fixed-action-btn toolbar'>
+      <a id="add-fach-btn" class='btn-floating btn-large red'>
+        <i class='large material-icons'>mode_edit</i>
+      </a>
+      <ul>
+        <li class='waves-effect waves-light'>
+          <a class="modal-trigger" href="#modal_add">
+            <i class='material-icons'>add</i>
+          </a>
+        </li>
+        <li class='waves-effect waves-light'>
+          <a href="options.html">
+            <i class='material-icons'>autorenew</i>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="tap-target" data-activates="add-fach-btn">
+      <div class="tap-target-content white-text">
+        <h5>Hallo!</h5>
+        <p>Mit diesem Button kann man neue Einträge hinzufügen oder die Daten auf der Seite neu laden.</p>
       </div>
     </div>
+
+    <div id="modal_add" class="modal">
+      <div class="modal-content teal white-text">
+        <h4>Ein neues Fach hinzufügen</h4>
+        <h6>Bei der Bestätigung wird ein neues, leeres Fach hinzugefügt.</h6>
+        <h6> Wichtig: Bitte umgehend nach der Erstellung die neuen Daten eintragen, da die Erstellung eine sofortige Wirkung auf
+          alle Accounts hat.</h6>
+        <br/>
+        <div class="row">
+          <div class="input-field col s6">
+            <input class="white-text" placeholder="Neues Fach" id="fach_name_input" type="text">
+            <label class="active white-text" for="fach_name_input">Fach</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer teal darken-1">
+        <a class="modal-action modal-close waves-effect waves-red btn-flat white-text">Abbrechen</a>
+        <a id="create-btn" class="modal-action modal-close waves-effect waves-green btn-flat white-text">Erstellen</a>
+      </div>
+    </div>
+
   </main>
+
 </body>
 
 </html>
