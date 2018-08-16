@@ -187,33 +187,35 @@ class SQLHandler {
 
   static generateSQLSchoolDataList(id_where, sql_data, active_fach, onActiveFachChanged, onUpdate) {
     $("#settings_listview").remove();
-    $(id_where).append("<ul id='settings_listview' class='collapsible' data-collapsible='expandable'></ul>");
+    $(id_where).append("<ul id='settings_listview' class='collapsible popout' data-collapsible='expandable'></ul>");
 
     for (let i = 0; i < sql_data.length; i++) {
       let head = sql_data[i].fach;
 
       let active = (active_fach == sql_data[i].fach);
 
-      let firstLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-values-unterstufe." + sql_data[i].fach + "' value='" + sql_data[i].unterstufe + "' type='text'><label class='active' for='new-values-unterstufe." + sql_data[i].fach + "'>Stufen (a,b,c,d,e)</label></div> </div></div>";
-      let secondLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-kuerzel." + sql_data[i].fach + "' value='" + decodeURIComponent(sql_data[i].kurskuerzel) + "' type='text'><label class='active' for='new-kuerzel." + sql_data[i].fach + "'>Kurskürzel</label></div> </div> </div>";
-      let thirdLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-11." + sql_data[i].fach + "' value='" + sql_data[i].kursanzahl_11 + "' type='number'><label class='active' for='new-anzahl-11." + sql_data[i].fach + "'>Kursanzahl Q11</label></div> </div> </div>";
-      let fourthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-12." + sql_data[i].fach + "' value='" + sql_data[i].kursanzahl_12 + "' type='number'><label class='active' for='new-anzahl-12." + sql_data[i].fach + "'>Kursanzahl Q12</label></div> </div> </div>";
-      let fifthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-13." + sql_data[i].fach + "' value='" + sql_data[i].kursanzahl_13 + "' type='number'><label class='active' for='new-anzahl-13." + sql_data[i].fach + "'>Kursanzahl Q13</label></div> </div> </div>";
-      let sixthLine = "<div class='row'> <div class='col s3 offset-s3'> <a id=save-btn." + sql_data[i].fach + " class='waves-effect waves-light btn-large green'><i class='material-icons right'>save</i>Save</a> </div> <div class='col s3'> <a id=del-btn." + sql_data[i].fach + " class='waves-effect waves-light btn-large red'><i class='material-icons right'>delete</i>Delete</a> </div> </div>";
+      let fach_id = sql_data[i].fach.replace(" ", "-");
 
-      $("#settings_listview").append("<li> <div class='collapsible-header " + (active ? "active" : "") + "'><h6>" + head + "</h6></div> <div class='collapsible-body'> " + firstLine + secondLine + thirdLine + fourthLine + fifthLine + sixthLine + " </div> </li>");
+      let firstLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-values-unterstufe." + fach_id + "' value='" + sql_data[i].unterstufe + "' type='text'><label class='active' for='new-values-unterstufe." + fach_id + "'>Stufen (a,b,c,d,e)</label></div> </div></div>";
+      let secondLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-kuerzel." + fach_id + "' value='" + decodeURIComponent(sql_data[i].kurskuerzel) + "' type='text'><label class='active' for='new-kuerzel." + fach_id + "'>Kurskürzel</label></div> </div> </div>";
+      let thirdLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-11." + fach_id + "' value='" + sql_data[i].kursanzahl_11 + "' type='number'><label class='active' for='new-anzahl-11." + fach_id + "'>Kursanzahl Q11</label></div> </div> </div>";
+      let fourthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-12." + fach_id + "' value='" + sql_data[i].kursanzahl_12 + "' type='number'><label class='active' for='new-anzahl-12." + fach_id + "'>Kursanzahl Q12</label></div> </div> </div>";
+      let fifthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-13." + fach_id + "' value='" + sql_data[i].kursanzahl_13 + "' type='number'><label class='active' for='new-anzahl-13." + fach_id + "'>Kursanzahl Q13</label></div> </div> </div>";
+      let sixthLine = "<div class='row'> <div class='col s3 offset-s3'> <a id=save-btn." + fach_id + " class='waves-effect waves-light btn-large green'><i class='material-icons right'>save</i>Speichern</a> </div> <div class='col s3'> <a id=del-btn." + fach_id + " class='waves-effect waves-light btn-large red'><i class='material-icons right'>delete</i>Löschen</a> </div> </div>";
+
+      $("#settings_listview").append("<li> <div class='collapsible-header " + (active ? "active" : "") + "'><h6>" + head + "</h6> " + (active ? "<span class='new badge' data-badge-caption='changed'></span>" : "") + " </div> <div class='collapsible-body'> " + firstLine + secondLine + thirdLine + fourthLine + fifthLine + sixthLine + " </div> </li>");
 
       //Save button
-      let v = "save-btn." + sql_data[i].fach;
+      let v = "save-btn." + fach_id;
 
       document.getElementById(v).addEventListener("click", function (event) {
         //Fetch data
 
-        let firstVal = document.getElementById("new-values-unterstufe." + sql_data[i].fach).value.trim();
-        let secondVal = document.getElementById("new-kuerzel." + sql_data[i].fach).value.trim();
-        let thirdVal = document.getElementById("new-anzahl-11." + sql_data[i].fach).value.trim();
-        let fourthVal = document.getElementById("new-anzahl-12." + sql_data[i].fach).value.trim();
-        let fifthVal = document.getElementById("new-anzahl-13." + sql_data[i].fach).value.trim();
+        let firstVal = document.getElementById("new-values-unterstufe." + fach_id).value.trim();
+        let secondVal = document.getElementById("new-kuerzel." + fach_id).value.trim();
+        let thirdVal = document.getElementById("new-anzahl-11." + fach_id).value.trim();
+        let fourthVal = document.getElementById("new-anzahl-12." + fach_id).value.trim();
+        let fifthVal = document.getElementById("new-anzahl-13." + fach_id).value.trim();
 
         let tempArr = [thirdVal, fourthVal, fifthVal];
         for (let j = 11; j <= 13; j++) {
@@ -233,7 +235,7 @@ class SQLHandler {
       });
 
       //Delete button
-      let v2 = "del-btn." + sql_data[i].fach;
+      let v2 = "del-btn." + fach_id;
 
       document.getElementById(v2).addEventListener("click", function (event) {
         onActiveFachChanged(sql_data[i].fach);

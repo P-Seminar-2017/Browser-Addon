@@ -34,7 +34,7 @@ var global_loaded_values = {
 }
 
 var unterstufe = ["5", "6", "7", "8", "9", "10"];
-var unterstufe_stufen = ["a", "b", "c", "d"];
+var unterstufe_stufen = ["a", "b", "c", "d", "e"];
 var oberstufe = ["11", "12", "13"];
 
 
