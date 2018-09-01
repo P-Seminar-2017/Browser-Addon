@@ -1,30 +1,21 @@
 class SQLHandler {
 
-  static getSQLData(fach, klasse, stufe, onSuccess, onError) {
+  static verifyAPIKey(api_key, onSuccess, onError) {
     Navigation.showLoader(true);
 
     $.get("http://api.lakinator.bplaced.net/request.php", {
-      fach: "" + encodeURIComponent(fach),
-      klasse: "" + encodeURIComponent(klasse),
-      stufe: "" + encodeURIComponent(stufe),
-      key: "917342346673"
+      key: api_key
     }, function (data, status, xhr) {
       Navigation.showLoader(false);
 
       if (status == "success") {
-        console.log("[GET_SQL_DATA]");
+        console.log("[VERIFY_SQL_DATA]");
         console.log(data);
 
         if (data.success == "true") {
-
-          if (data.data.length == 0) {
-            onError("Nichts gefunden");
-          } else {
-            onSuccess(data.data);
-          }
-
+          onSuccess();
         } else {
-          onError("Ein Fehler ist aufgetreten");
+          onError(data.error);
         }
 
       } else {
@@ -34,30 +25,78 @@ class SQLHandler {
     });
   }
 
+  static getSQLData(fach, klasse, stufe, onSuccess, onError) {
+    Navigation.showLoader(true);
+
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
+
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        fach: "" + encodeURIComponent(fach),
+        klasse: "" + encodeURIComponent(klasse),
+        stufe: "" + encodeURIComponent(stufe),
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
+
+        if (status == "success") {
+          console.log("[GET_SQL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+
+            if (data.data.length == 0) {
+              onError("Nichts gefunden");
+            } else {
+              onSuccess(data.data);
+            }
+
+          } else {
+            onError("Ein Fehler ist aufgetreten");
+          }
+
+        } else {
+          //Connection Error
+          onError("Verbindung fehlgeschlagen");
+        }
+      });
+    });
+
+  }
+
 
   static deleteSQLData(sql_id, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      id: "" + sql_id,
-      key: "917342346673"
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[DELETE_SQL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        id: "" + sql_id,
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich gelöscht");
+        if (status == "success") {
+          console.log("[DELETE_SQL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich gelöscht");
+          } else {
+            Navigation.showMessage("Löschen fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Löschen fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
 
   }
@@ -66,27 +105,34 @@ class SQLHandler {
   static editSQLData(sql_id, text, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      id: "" + sql_id,
-      text: "" + encodeURIComponent(text),
-      key: "917342346673"
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[EDIT_SQL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        id: "" + sql_id,
+        text: "" + encodeURIComponent(text),
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich editiert");
+        if (status == "success") {
+          console.log("[EDIT_SQL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich editiert");
+          } else {
+            Navigation.showMessage("Editieren fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Editieren fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
 
   }
@@ -94,92 +140,113 @@ class SQLHandler {
   static getSQLSchoolData(school, onSuccess, onError) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      school: school,
-      key: "917342346673"
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[SCHOOL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        school: school,
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
+        if (status == "success") {
+          console.log("[SCHOOL_DATA]");
+          console.log(data);
 
-          if (data.data.length == 0) {
-            onError("Nichts gefunden");
+          if (data.success == "true") {
+
+            if (data.data.length == 0) {
+              onError("Nichts gefunden");
+            } else {
+              onSuccess(data.data);
+            }
+
           } else {
-            onSuccess(data.data);
+            onError("Ein Fehler ist aufgetreten");
           }
 
         } else {
-          onError("Ein Fehler ist aufgetreten");
+          //Connection Error
+          onError("Verbindung fehlgeschlagen");
         }
+      });
 
-      } else {
-        //Connection Error
-        onError("Verbindung fehlgeschlagen");
-      }
     });
   }
 
   static editSQLSchoolData(school, fach, unterstufe, oberstufe, kurskuerzel, kursanzahl_11, kursanzahl_12, kursanzahl_13, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      school: school,
-      key: "917342346673",
-      fach: fach,
-      unterstufe: decodeURIComponent(unterstufe),
-      oberstufe: decodeURIComponent(oberstufe),
-      kurskuerzel: encodeURIComponent(kurskuerzel),
-      kursanzahl_11: kursanzahl_11,
-      kursanzahl_12: kursanzahl_12,
-      kursanzahl_13: kursanzahl_13
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[EDIT_SQL_SCHOOL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        school: school,
+        key: storage.apiKey,
+        fach: fach,
+        unterstufe: decodeURIComponent(unterstufe),
+        oberstufe: decodeURIComponent(oberstufe),
+        kurskuerzel: encodeURIComponent(kurskuerzel),
+        kursanzahl_11: kursanzahl_11,
+        kursanzahl_12: kursanzahl_12,
+        kursanzahl_13: kursanzahl_13
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich editiert");
+        if (status == "success") {
+          console.log("[EDIT_SQL_SCHOOL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich editiert");
+          } else {
+            Navigation.showMessage("Editieren fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Editieren fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
   }
 
   static deleteSQLSchoolData(school, fach, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      school: school,
-      key: "917342346673",
-      fach: (fach)
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[DELETE_SQL_SCHOOL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        school: school,
+        key: storage.apiKey,
+        fach: (fach)
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich gelöscht");
+        if (status == "success") {
+          console.log("[DELETE_SQL_SCHOOL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich gelöscht");
+          } else {
+            Navigation.showMessage("Löschen fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Löschen fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
   }
 
