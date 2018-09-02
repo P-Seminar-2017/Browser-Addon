@@ -125,7 +125,7 @@ $(document).ready(function () {
     let value = $(input_fach_id).val();
     active_fach = value;
     $(input_fach_id).val("");
-    SQLHandler.editSQLSchoolData("gymlap", value, "", "", "", 0, 0, 0, loadSQL);
+    SQLHandler.editSQLSchoolData("gymlap", value, "a,b,c,d", "", "", 0, 0, 0, loadSQL);
   });
 
   loadSQL();
