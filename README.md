@@ -1,7 +1,7 @@
 # Browser-Extension
 
 - School data is now cloud storage based and editable in settings
-- Chrome: Working, version 1.2
+- Chrome: Working, version 1.2.1
 - Firefox: Working, version 1.1.0
 
 ## Gif Showcase
