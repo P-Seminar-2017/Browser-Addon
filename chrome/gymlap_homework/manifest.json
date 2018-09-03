@@ -10,7 +10,7 @@
     "128": "img/icon.png"
   },
 
-  "update_url": "https://www.google.com",
+  "update_url": "http://api.lakinator.bplaced.net/update/gymlap.xml",
 
   "content_scripts": [{
     "matches": [
