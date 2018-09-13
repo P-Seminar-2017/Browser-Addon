@@ -127,11 +127,11 @@ function initialize() {
                   if (data[i].oberstufe.includes("" + j)) {
                     if (data[i]["kursanzahl_" + j] == 1) {
                       oberstufe_kurse["q" + j][data[i].fach] = [];
-                      oberstufe_kurse["q" + j][data[i].fach].push("1" + data[i].kurskuerzel + "0");
+                      oberstufe_kurse["q" + j][data[i].fach].push((""+j).charAt(1) + data[i].kurskuerzel + "0");
                     } else {
                       oberstufe_kurse["q" + j][data[i].fach] = [];
                       for (let k = 1; k <= data[i]["kursanzahl_" + j]; k++) {
-                        oberstufe_kurse["q" + j][data[i].fach].push("1" + data[i].kurskuerzel + k);
+                        oberstufe_kurse["q" + j][data[i].fach].push((""+j).charAt(1) + data[i].kurskuerzel + k);
                       }
                     }
                   }
