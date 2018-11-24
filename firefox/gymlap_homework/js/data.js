@@ -1,11 +1,8 @@
-var checkbox_oberstufe_id = "#oberstufe-box";
-var dropdown_fach_id = "#select_fach";
-var dropdown_klasse_id = "#select_klasse";
-var dropdown_stufe_id = "#select_stufe";
-var dropdown_abgabe_id = "#select_date";
-
-
-//TODO Schuldaten anders laden und vervollständigen/anpassen
+var globaldata_checkbox_oberstufe_id = "#oberstufe-box";
+var globaldata_dropdown_fach_id = "#select_fach";
+var globaldata_dropdown_klasse_id = "#select_klasse";
+var globaldata_dropdown_stufe_id = "#select_stufe";
+var globaldata_dropdown_abgabe_id = "#select_date";
 
 //Objekt dass alle Daten enthält die gerade von der Website geladen wurden
 var global_loaded_values = {
@@ -33,9 +30,9 @@ var global_loaded_values = {
   }
 }
 
-var unterstufe = ["5", "6", "7", "8", "9", "10"];
-var unterstufe_stufen = ["a", "b", "c", "d", "e"];
-var oberstufe = ["11", "12", "13"];
+var globaldata_unterstufe = ["5", "6", "7", "8", "9", "10"];
+var globaldata_unterstufe_stufen = ["a", "b", "c", "d", "e"];
+var globaldata_oberstufe = ["11", "12", "13"];
 
 
 //TODO Make Data class

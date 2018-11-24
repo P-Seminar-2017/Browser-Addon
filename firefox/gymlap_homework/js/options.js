@@ -5,6 +5,10 @@ $(document).ready(function () {
   let box_disableHelp_id = "#box-disableHelp";
   let label_disableHelp_id = "#label-disableHelp";
 
+  let input_api_key_id = "#api-key-input";
+  let icon_api_key_id = "#icon-connection-status";
+  let link_api_key_update_id = "#api-connection-update-link";
+
   let input_fach_id = "#fach_name_input";
   let create_btn_id = "#create-btn";
 
@@ -14,7 +18,8 @@ $(document).ready(function () {
   chrome.storage.sync.get({
     //Default
     loadFromWebsite: false,
-    disableHelp: false
+    disableHelp: false,
+    apiKey: ""
   }, function (storage) {
     //Updaten von den Bestandteilen
     $(label_loadFromWebsite_id).text("Daten von der WebUntis Website laden - " + (storage.loadFromWebsite ? "An" : "Aus"));
@@ -24,8 +29,35 @@ $(document).ready(function () {
     $(box_disableHelp_id).prop("checked", storage.disableHelp);
 
     if (!storage.disableHelp) $('.tap-target').tapTarget('open');
+
+    $(input_api_key_id).val(storage.apiKey);
+    Materialize.updateTextFields();
+
+    //API Key Validation
+    SQLHandler.verifyAPIKey(storage.apiKey, 
+      //Success
+      function () {
+        $(icon_api_key_id).text("cloud_done");
+        if ($(icon_api_key_id).hasClass("red-text")) $(icon_api_key_id).removeClass("red-text");
+        if ($(icon_api_key_id).hasClass("blue-text")) $(icon_api_key_id).removeClass("blue-text");
+        if (!$(icon_api_key_id).hasClass("green-text")) $(icon_api_key_id).addClass("green-text");
+
+        $(link_api_key_update_id).attr("data-tooltip", "Verified");
+        $('.tooltipped').tooltip();
+    },
+      //Error
+      function () {
+        $(icon_api_key_id).text("cloud_off");
+        if ($(icon_api_key_id).hasClass("green-text")) $(icon_api_key_id).removeClass("green-text");
+        if ($(icon_api_key_id).hasClass("blue-text")) $(icon_api_key_id).removeClass("blue-text");
+        if (!$(icon_api_key_id).hasClass("red-text")) $(icon_api_key_id).addClass("red-text");
+
+        $(link_api_key_update_id).attr("data-tooltip", "Error");
+        $('.tooltipped').tooltip();
+    });
   });
 
+  //Load from website
   $(box_loadFromWebsite_id).on("change", function () {
     let value = $(box_loadFromWebsite_id).prop("checked");
 
@@ -39,6 +71,7 @@ $(document).ready(function () {
     Materialize.toast("Gespeichert!", 2000, "rounded");
   });
 
+  //Disable/Enable help
   $(box_disableHelp_id).on("change", function () {
     let value = $(box_disableHelp_id).prop("checked");
 
@@ -52,6 +85,39 @@ $(document).ready(function () {
     Materialize.toast("Gespeichert!", 2000, "rounded");
   });
 
+  //API Input
+  $(input_api_key_id).keyup(function (e) {
+
+    if (e.which == 13) {
+      //Enter pressed
+      $(link_api_key_update_id).click();
+    } else {
+      $(icon_api_key_id).text("cloud_upload");
+      if ($(icon_api_key_id).hasClass("red-text")) $(icon_api_key_id).removeClass("red-text");
+      if ($(icon_api_key_id).hasClass("green-text")) $(icon_api_key_id).removeClass("green-text");
+      if (!$(icon_api_key_id).hasClass("blue-text")) $(icon_api_key_id).addClass("blue-text");
+
+      $(link_api_key_update_id).attr("data-tooltip", "Klicken zum Überprüfen");
+      $('.tooltipped').tooltip();
+    }
+
+  });
+
+  //API refresh button
+  $(link_api_key_update_id).click(function () {
+    let value = $(input_api_key_id).val();
+
+    //Speichern
+    chrome.storage.sync.set({
+      apiKey: value
+    }, function () {
+      location.reload();
+    });
+
+  });
+
+
+  //Footer
   $('.modal').modal();
   $(input_fach_id).val("");
 
@@ -59,7 +125,7 @@ $(document).ready(function () {
     let value = $(input_fach_id).val();
     active_fach = value;
     $(input_fach_id).val("");
-    SQLHandler.editSQLSchoolData("gymlap", value, "", "", "", 0, 0, 0, loadSQL);
+    SQLHandler.editSQLSchoolData("gymlap", value, "a,b,c,d", "", "", 0, 0, 0, loadSQL);
   });
 
   loadSQL();

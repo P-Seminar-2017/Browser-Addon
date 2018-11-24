@@ -1,30 +1,21 @@
 class SQLHandler {
 
-  static getSQLData(fach, klasse, stufe, onSuccess, onError) {
+  static verifyAPIKey(api_key, onSuccess, onError) {
     Navigation.showLoader(true);
 
     $.get("http://api.lakinator.bplaced.net/request.php", {
-      fach: "" + encodeURIComponent(fach),
-      klasse: "" + encodeURIComponent(klasse),
-      stufe: "" + encodeURIComponent(stufe),
-      key: "917342346673"
+      key: api_key
     }, function (data, status, xhr) {
       Navigation.showLoader(false);
 
       if (status == "success") {
-        console.log("[GET_SQL_DATA]");
+        console.log("[VERIFY_SQL_DATA]");
         console.log(data);
 
         if (data.success == "true") {
-
-          if (data.data.length == 0) {
-            onError("Nichts gefunden");
-          } else {
-            onSuccess(data.data);
-          }
-
+          onSuccess();
         } else {
-          onError("Ein Fehler ist aufgetreten");
+          onError(data.error);
         }
 
       } else {
@@ -34,30 +25,78 @@ class SQLHandler {
     });
   }
 
+  static getSQLData(fach, klasse, stufe, onSuccess, onError) {
+    Navigation.showLoader(true);
+
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
+
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        fach: "" + encodeURIComponent(fach),
+        klasse: "" + encodeURIComponent(klasse),
+        stufe: "" + encodeURIComponent(stufe),
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
+
+        if (status == "success") {
+          console.log("[GET_SQL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+
+            if (data.data.length == 0) {
+              onError("Nichts gefunden");
+            } else {
+              onSuccess(data.data);
+            }
+
+          } else {
+            onError("Ein Fehler ist aufgetreten");
+          }
+
+        } else {
+          //Connection Error
+          onError("Verbindung fehlgeschlagen");
+        }
+      });
+    });
+
+  }
+
 
   static deleteSQLData(sql_id, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      id: "" + sql_id,
-      key: "917342346673"
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[DELETE_SQL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        id: "" + sql_id,
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich gelöscht");
+        if (status == "success") {
+          console.log("[DELETE_SQL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich gelöscht");
+          } else {
+            Navigation.showMessage("Löschen fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Löschen fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
 
   }
@@ -66,27 +105,34 @@ class SQLHandler {
   static editSQLData(sql_id, text, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      id: "" + sql_id,
-      text: "" + encodeURIComponent(text),
-      key: "917342346673"
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[EDIT_SQL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        id: "" + sql_id,
+        text: "" + encodeURIComponent(text),
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich editiert");
+        if (status == "success") {
+          console.log("[EDIT_SQL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich editiert");
+          } else {
+            Navigation.showMessage("Editieren fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Editieren fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
 
   }
@@ -94,92 +140,113 @@ class SQLHandler {
   static getSQLSchoolData(school, onSuccess, onError) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      school: school,
-      key: "917342346673"
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[SCHOOL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        school: school,
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
+        if (status == "success") {
+          console.log("[SCHOOL_DATA]");
+          console.log(data);
 
-          if (data.data.length == 0) {
-            onError("Nichts gefunden");
+          if (data.success == "true") {
+
+            if (data.data.length == 0) {
+              onError("Nichts gefunden");
+            } else {
+              onSuccess(data.data);
+            }
+
           } else {
-            onSuccess(data.data);
+            onError("Ein Fehler ist aufgetreten");
           }
 
         } else {
-          onError("Ein Fehler ist aufgetreten");
+          //Connection Error
+          onError("Verbindung fehlgeschlagen");
         }
+      });
 
-      } else {
-        //Connection Error
-        onError("Verbindung fehlgeschlagen");
-      }
     });
   }
 
   static editSQLSchoolData(school, fach, unterstufe, oberstufe, kurskuerzel, kursanzahl_11, kursanzahl_12, kursanzahl_13, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      school: school,
-      key: "917342346673",
-      fach: fach,
-      unterstufe: decodeURIComponent(unterstufe),
-      oberstufe: decodeURIComponent(oberstufe),
-      kurskuerzel: encodeURIComponent(kurskuerzel),
-      kursanzahl_11: kursanzahl_11,
-      kursanzahl_12: kursanzahl_12,
-      kursanzahl_13: kursanzahl_13
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[EDIT_SQL_SCHOOL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        school: school,
+        key: storage.apiKey,
+        fach: fach,
+        unterstufe: decodeURIComponent(unterstufe),
+        oberstufe: decodeURIComponent(oberstufe),
+        kurskuerzel: encodeURIComponent(kurskuerzel),
+        kursanzahl_11: kursanzahl_11,
+        kursanzahl_12: kursanzahl_12,
+        kursanzahl_13: kursanzahl_13
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich editiert");
+        if (status == "success") {
+          console.log("[EDIT_SQL_SCHOOL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich editiert");
+          } else {
+            Navigation.showMessage("Editieren fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Editieren fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
   }
 
   static deleteSQLSchoolData(school, fach, onReady) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
-      school: school,
-      key: "917342346673",
-      fach: (fach)
-    }, function (data, status, xhr) {
-      Navigation.showLoader(false);
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
 
-      if (status == "success") {
-        console.log("[DELETE_SQL_SCHOOL_DATA]");
-        console.log(data);
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        school: school,
+        key: storage.apiKey,
+        fach: (fach)
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
 
-        if (data.success == "true") {
-          Navigation.showMessage("Eintrag erfolgreich gelöscht");
+        if (status == "success") {
+          console.log("[DELETE_SQL_SCHOOL_DATA]");
+          console.log(data);
+
+          if (data.success == "true") {
+            Navigation.showMessage("Eintrag erfolgreich gelöscht");
+          } else {
+            Navigation.showMessage("Löschen fehlgeschlagen");
+          }
         } else {
-          Navigation.showMessage("Löschen fehlgeschlagen");
+          //Connection Error
         }
-      } else {
-        //Connection Error
-      }
 
-      onReady();
+        onReady();
+      });
+
     });
   }
 
@@ -194,26 +261,28 @@ class SQLHandler {
 
       let active = (active_fach == sql_data[i].fach);
 
-      let firstLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-values-unterstufe." + sql_data[i].fach + "' value='" + sql_data[i].unterstufe + "' type='text'><label class='active' for='new-values-unterstufe." + sql_data[i].fach + "'>Stufen (a,b,c,d,e)</label></div> </div></div>";
-      let secondLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-kuerzel." + sql_data[i].fach + "' value='" + decodeURIComponent(sql_data[i].kurskuerzel) + "' type='text'><label class='active' for='new-kuerzel." + sql_data[i].fach + "'>Kurskürzel</label></div> </div> </div>";
-      let thirdLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-11." + sql_data[i].fach + "' value='" + sql_data[i].kursanzahl_11 + "' type='number'><label class='active' for='new-anzahl-11." + sql_data[i].fach + "'>Kursanzahl Q11</label></div> </div> </div>";
-      let fourthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-12." + sql_data[i].fach + "' value='" + sql_data[i].kursanzahl_12 + "' type='number'><label class='active' for='new-anzahl-12." + sql_data[i].fach + "'>Kursanzahl Q12</label></div> </div> </div>";
-      let fifthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-13." + sql_data[i].fach + "' value='" + sql_data[i].kursanzahl_13 + "' type='number'><label class='active' for='new-anzahl-13." + sql_data[i].fach + "'>Kursanzahl Q13</label></div> </div> </div>";
-      let sixthLine = "<div class='row'> <div class='col s3 offset-s3'> <a id=save-btn." + sql_data[i].fach + " class='waves-effect waves-light btn-large green'><i class='material-icons right'>save</i>Speichern</a> </div> <div class='col s3'> <a id=del-btn." + sql_data[i].fach + " class='waves-effect waves-light btn-large red'><i class='material-icons right'>delete</i>Löschen</a> </div> </div>";
+      let fach_id = sql_data[i].fach.replace(" ", "-");
+
+      let firstLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-values-unterstufe." + fach_id + "' value='" + sql_data[i].unterstufe + "' type='text'><label class='active' for='new-values-unterstufe." + fach_id + "'>Stufen (a,b,c,d,e)</label></div> </div></div>";
+      let secondLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-kuerzel." + fach_id + "' value='" + decodeURIComponent(sql_data[i].kurskuerzel) + "' type='text'><label class='active' for='new-kuerzel." + fach_id + "'>Kurskürzel</label></div> </div> </div>";
+      let thirdLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-11." + fach_id + "' value='" + sql_data[i].kursanzahl_11 + "' type='number'><label class='active' for='new-anzahl-11." + fach_id + "'>Kursanzahl Q11</label></div> </div> </div>";
+      let fourthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-12." + fach_id + "' value='" + sql_data[i].kursanzahl_12 + "' type='number'><label class='active' for='new-anzahl-12." + fach_id + "'>Kursanzahl Q12</label></div> </div> </div>";
+      let fifthLine = "<div class='row'> <div class='col s10'> <div class='input-field'><input id='new-anzahl-13." + fach_id + "' value='" + sql_data[i].kursanzahl_13 + "' type='number'><label class='active' for='new-anzahl-13." + fach_id + "'>Kursanzahl Q13</label></div> </div> </div>";
+      let sixthLine = "<div class='row'> <div class='col s3 offset-s3'> <a id=save-btn." + fach_id + " class='waves-effect waves-light btn-large green'><i class='material-icons right'>save</i>Speichern</a> </div> <div class='col s3'> <a id=del-btn." + fach_id + " class='waves-effect waves-light btn-large red'><i class='material-icons right'>delete</i>Löschen</a> </div> </div>";
 
       $("#settings_listview").append("<li> <div class='collapsible-header " + (active ? "active" : "") + "'><h6>" + head + "</h6> " + (active ? "<span class='new badge' data-badge-caption='changed'></span>" : "") + " </div> <div class='collapsible-body'> " + firstLine + secondLine + thirdLine + fourthLine + fifthLine + sixthLine + " </div> </li>");
 
       //Save button
-      let v = "save-btn." + sql_data[i].fach;
+      let v = "save-btn." + fach_id;
 
       document.getElementById(v).addEventListener("click", function (event) {
         //Fetch data
 
-        let firstVal = document.getElementById("new-values-unterstufe." + sql_data[i].fach).value.trim();
-        let secondVal = document.getElementById("new-kuerzel." + sql_data[i].fach).value.trim();
-        let thirdVal = document.getElementById("new-anzahl-11." + sql_data[i].fach).value.trim();
-        let fourthVal = document.getElementById("new-anzahl-12." + sql_data[i].fach).value.trim();
-        let fifthVal = document.getElementById("new-anzahl-13." + sql_data[i].fach).value.trim();
+        let firstVal = document.getElementById("new-values-unterstufe." + fach_id).value.trim();
+        let secondVal = document.getElementById("new-kuerzel." + fach_id).value.trim();
+        let thirdVal = document.getElementById("new-anzahl-11." + fach_id).value.trim();
+        let fourthVal = document.getElementById("new-anzahl-12." + fach_id).value.trim();
+        let fifthVal = document.getElementById("new-anzahl-13." + fach_id).value.trim();
 
         let tempArr = [thirdVal, fourthVal, fifthVal];
         for (let j = 11; j <= 13; j++) {
@@ -233,7 +302,7 @@ class SQLHandler {
       });
 
       //Delete button
-      let v2 = "del-btn." + sql_data[i].fach;
+      let v2 = "del-btn." + fach_id;
 
       document.getElementById(v2).addEventListener("click", function (event) {
         onActiveFachChanged(sql_data[i].fach);
