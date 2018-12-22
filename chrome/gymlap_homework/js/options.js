@@ -11,6 +11,7 @@ $(document).ready(function () {
 
   let input_fach_id = "#fach_name_input";
   let create_btn_id = "#create-btn";
+  let autorenew_btn_id = "#autorenew";
 
   let active_fach = "";
 
@@ -34,7 +35,7 @@ $(document).ready(function () {
     Materialize.updateTextFields();
 
     //API Key Validation
-    SQLHandler.verifyAPIKey(storage.apiKey, 
+    SQLHandler.verifyAPIKey(storage.apiKey,
       //Success
       function () {
         $(icon_api_key_id).text("cloud_done");
@@ -44,7 +45,7 @@ $(document).ready(function () {
 
         $(link_api_key_update_id).attr("data-tooltip", "Verified");
         $('.tooltipped').tooltip();
-    },
+      },
       //Error
       function () {
         $(icon_api_key_id).text("cloud_off");
@@ -54,7 +55,7 @@ $(document).ready(function () {
 
         $(link_api_key_update_id).attr("data-tooltip", "Error");
         $('.tooltipped').tooltip();
-    });
+      });
   });
 
   //Load from website
@@ -126,6 +127,16 @@ $(document).ready(function () {
     active_fach = value;
     $(input_fach_id).val("");
     SQLHandler.editSQLSchoolData("gymlap", value, "a,b,c,d", "", "", 0, 0, 0, loadSQL);
+  });
+
+  $(autorenew_btn_id).click(function () {
+    SQLHandler.updateSQLData(function (changes) {
+      if (changes <= 0) Navigation.showMessage("Keine Einträge gelöscht");
+      else if (changes == 1) Navigation.showMessage(changes + " Eintrag gelöscht!");
+      else if (changes > 1) Navigation.showMessage(changes  + " Einträge gelöscht!");
+    }, function (error) {
+      Navigation.showMessage(error);
+    });
   });
 
   loadSQL();

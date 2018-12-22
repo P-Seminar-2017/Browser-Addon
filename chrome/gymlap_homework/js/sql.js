@@ -25,6 +25,33 @@ class SQLHandler {
     });
   }
 
+  static updateSQLData(onSuccess, onError) {
+    Navigation.showLoader(true);
+
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
+
+      $.get("http://api.lakinator.bplaced.net/request.php", {
+        update: "true",
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
+
+        if (status == "success") {
+          console.log("[UPDATE_SQL_DATA]");
+          console.log(data);
+
+          onSuccess(data.changes);
+        } else {
+          //Connection Error
+          onError("Verbindung fehlgeschlagen");
+        }
+      });
+    });
+  }
+
   static getSQLData(fach, klasse, stufe, onSuccess, onError) {
     Navigation.showLoader(true);
 
