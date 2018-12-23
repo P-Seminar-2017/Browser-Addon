@@ -1,8 +1,8 @@
 # Browser-Extension
 
-- School data is now cloud storage based and editable in settings
-- Chrome: Working, version 1.2.1
-- Firefox: Working, version 1.2
+- API is now hosted on the school website
+- Chrome: Working, version 1.3
+- Firefox: Working, version 1.3
 
 ## Gif Showcase
 
