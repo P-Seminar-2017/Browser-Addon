@@ -20,7 +20,7 @@ $(document).ready(function() {
       apiKey: ""
     }, function (storage) {
 
-      $.get("http://api.lakinator.bplaced.net/request.php", {
+      $.get("http://api.gymlap.de/request.php", {
         fach: "" + encodeURIComponent(data.fach),
         klasse: "" + encodeURIComponent(data.klasse),
         stufe: "" + encodeURIComponent(data.stufe),
