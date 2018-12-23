@@ -3,7 +3,7 @@ class SQLHandler {
   static verifyAPIKey(api_key, onSuccess, onError) {
     Navigation.showLoader(true);
 
-    $.get("http://api.lakinator.bplaced.net/request.php", {
+    $.get("http://api.gymlap.de/request.php", {
       key: api_key
     }, function (data, status, xhr) {
       Navigation.showLoader(false);
@@ -25,6 +25,33 @@ class SQLHandler {
     });
   }
 
+  static updateSQLData(onSuccess, onError) {
+    Navigation.showLoader(true);
+
+    chrome.storage.sync.get({
+      //Default
+      apiKey: ""
+    }, function (storage) {
+
+      $.get("http://api.gymlap.de/request.php", {
+        update: "true",
+        key: storage.apiKey
+      }, function (data, status, xhr) {
+        Navigation.showLoader(false);
+
+        if (status == "success") {
+          console.log("[UPDATE_SQL_DATA]");
+          console.log(data);
+
+          onSuccess(data.changes);
+        } else {
+          //Connection Error
+          onError("Verbindung fehlgeschlagen");
+        }
+      });
+    });
+  }
+
   static getSQLData(fach, klasse, stufe, onSuccess, onError) {
     Navigation.showLoader(true);
 
@@ -33,7 +60,7 @@ class SQLHandler {
       apiKey: ""
     }, function (storage) {
 
-      $.get("http://api.lakinator.bplaced.net/request.php", {
+      $.get("http://api.gymlap.de/request.php", {
         fach: "" + encodeURIComponent(fach),
         klasse: "" + encodeURIComponent(klasse),
         stufe: "" + encodeURIComponent(stufe),
@@ -75,7 +102,7 @@ class SQLHandler {
       apiKey: ""
     }, function (storage) {
 
-      $.get("http://api.lakinator.bplaced.net/request.php", {
+      $.get("http://api.gymlap.de/request.php", {
         id: "" + sql_id,
         key: storage.apiKey
       }, function (data, status, xhr) {
@@ -110,7 +137,7 @@ class SQLHandler {
       apiKey: ""
     }, function (storage) {
 
-      $.get("http://api.lakinator.bplaced.net/request.php", {
+      $.get("http://api.gymlap.de/request.php", {
         id: "" + sql_id,
         text: "" + encodeURIComponent(text),
         key: storage.apiKey
@@ -145,7 +172,7 @@ class SQLHandler {
       apiKey: ""
     }, function (storage) {
 
-      $.get("http://api.lakinator.bplaced.net/request.php", {
+      $.get("http://api.gymlap.de/request.php", {
         school: school,
         key: storage.apiKey
       }, function (data, status, xhr) {
@@ -184,7 +211,7 @@ class SQLHandler {
       apiKey: ""
     }, function (storage) {
 
-      $.get("http://api.lakinator.bplaced.net/request.php", {
+      $.get("http://api.gymlap.de/request.php", {
         school: school,
         key: storage.apiKey,
         fach: fach,
@@ -224,7 +251,7 @@ class SQLHandler {
       apiKey: ""
     }, function (storage) {
 
-      $.get("http://api.lakinator.bplaced.net/request.php", {
+      $.get("http://api.gymlap.de/request.php", {
         school: school,
         key: storage.apiKey,
         fach: (fach)
