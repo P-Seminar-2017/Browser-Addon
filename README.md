@@ -2,7 +2,7 @@
 
 - API is now hosted on the school website
 - Chrome: Working, version 1.3
-- Firefox: Working, version 1.3
+- Firefox: Working, version 1.4
 
 ## Gif Showcase
 
