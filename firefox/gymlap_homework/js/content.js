@@ -5,15 +5,11 @@ chrome.runtime.onMessage.addListener(
         let status = "";
 
         //Seite genau überprüfen ob verwertbare Daten drauf sind
-        //TODO: WebUntis Pattern an Lehrer anpassen -> https://neilo.webuntis.com/WebUntis/?school=Gymlap#classregpage?ttid=199497
+        //WebUntis Pattern -> https://neilo.webuntis.com/WebUntis/?school=Gymlap#classregpage?ttid=199497
         let single_class_pattern = new RegExp("[a-zA-Z]*:\/\/neilo\.webuntis\.com\/WebUntis\/\?school=Gymlap#classregpage\?ttid=[0-9]*");
-        //Listview WebUntis Seite von allen Klassen des Tages -> TODO genauen Link herausfinden
-        let multiple_class_pattern = new RegExp("[a-zA-Z]*:\/\/neilo\.webuntis\.com\/WebUntis\/\?school=Gymlap#classregpage\?ttid=[0-9]*");
+        //Listview WebUntis Seite von allen Klassen des Tages -> Feature coming soon
+        //let multiple_class_pattern = new RegExp("[a-zA-Z]*:\/\/neilo\.webuntis\.com\/WebUntis\/\?school=Gymlap#classregpage\?ttid=[0-9]*");
 
-        //!Debug!
-        let testPattern = new RegExp("file:\/\/\/C:\/Users\/Schalk\/Desktop\/webuntis\.html");
-        single_class_pattern = testPattern;
-        //!Debug!
 
         if (single_class_pattern.test(window.location.href)) {
           status = "single";
@@ -40,7 +36,7 @@ chrome.runtime.onMessage.addListener(
           oberstufe = klasse >= 11;
 
           //TODO Kurs bekommen (oder, falls vorhanden, die Klassenstufe)
-          if (!oberstufe) let kurs = klasseFull.replace(/[0-9]/g, '');
+          if (!oberstufe) kurs = klasseFull.replace(/[0-9]/g, '');
           else kurs = "1e4";
 
           //Lehrer
@@ -55,8 +51,7 @@ chrome.runtime.onMessage.addListener(
             klasse: klasse,
             kurs: kurs
           });
-
-        } else if (multiple_class_pattern.test(window.location.href)) {
+        } /* else if (multiple_class_pattern.test(window.location.href)) {
           status = "multiple";
           let lehrer = "";
           let faecher = {
@@ -80,7 +75,7 @@ chrome.runtime.onMessage.addListener(
             }
           };
 
-          /*  //Debug test
+            //Debug test
              let faecher = {
                unterstufe: ["Deutsch", "Englisch"],
                q11: ["Physik", "Englisch"],
@@ -102,7 +97,7 @@ chrome.runtime.onMessage.addListener(
                q12: {
 
                }
-             };*/
+             };
 
           //TODO Daten von der Seite holen
 
@@ -118,7 +113,7 @@ chrome.runtime.onMessage.addListener(
             kurse: kurse
           });
 
-        } else {
+        } */ else {
           status = "error";
 
           //Response senden

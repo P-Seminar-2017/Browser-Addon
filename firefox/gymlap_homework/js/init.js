@@ -151,6 +151,7 @@ function initialize() {
 
             function onError(error) {
               console.log("[SCHOOL_DATA] Error: " + error);
+              Navigation.showMessage("[SCHOOL_DATA] Error: " + error);
             }
 
             SQLHandler.getSQLSchoolData("gymlap", onSuccess, onError);

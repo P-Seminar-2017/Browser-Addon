@@ -3,23 +3,21 @@
 
   "name": "Gymlapp Hausaufgaben Planer",
   "description": "Gymlapp Hausaufgaben Planer",
-  "version": "1.3",
+  "version": "1.4",
   "icons": {
     "16": "img/icon.png",
     "48": "img/icon.png",
     "128": "img/icon.png"
   },
 
-  "applications": {
+  "browser_specific_settings": {
     "gecko": {
-      "id": "gymlap_homework@gmail.com",
-      "strict_min_version": "42.0"
+      "id": "lakinator.website@gmail.com"
     }
   },
 
   "content_scripts": [{
     "matches": [
-      "<all_urls>",
       "*://neilo.webuntis.com/WebUntis/*"
     ],
     "js": [
