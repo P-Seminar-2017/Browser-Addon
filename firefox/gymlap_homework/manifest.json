@@ -3,7 +3,7 @@
 
   "name": "Gymlapp Hausaufgaben Planer",
   "description": "Gymlapp Hausaufgaben Planer",
-  "version": "1.4",
+  "version": "1.5",
   "icons": {
     "16": "img/icon.png",
     "48": "img/icon.png",
@@ -18,7 +18,7 @@
 
   "content_scripts": [{
     "matches": [
-      "*://neilo.webuntis.com/WebUntis/*"
+      "*://neilo.webuntis.com/*"
     ],
     "js": [
       "js/jquery.min.js",

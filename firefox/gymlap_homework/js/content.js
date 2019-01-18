@@ -10,6 +10,7 @@ chrome.runtime.onMessage.addListener(
         //Listview WebUntis Seite von allen Klassen des Tages -> Feature coming soon
         //let multiple_class_pattern = new RegExp("[a-zA-Z]*:\/\/neilo\.webuntis\.com\/WebUntis\/\?school=Gymlap#classregpage\?ttid=[0-9]*");
 
+        console.log(window.location.href);
 
         if (single_class_pattern.test(window.location.href)) {
           status = "single";
@@ -26,18 +27,21 @@ chrome.runtime.onMessage.addListener(
           let klasseFull = $(".hiddenBox .foo table tbody tr:eq(0) td:eq(2)").text();
           kurs = $(".hiddenBox .foo table tbody tr:eq(2) td:eq(2)").text();
 
-          //TODO Ober- oder Unterstufe?
+          //Fach (Abkürzung)
           fach = $(".hiddenBox .foo table tbody tr:eq(2) td:eq(2)").text();
 
-          //Klasse bekommen
+          //Klasse
           klasse = klasseFull.replace(/[^0-9]/g, '');
 
-          //Oberstufe oder Unterstufe herausfinden
+          //Oberstufe oder Unterstufe
           oberstufe = klasse >= 11;
 
-          //TODO Kurs bekommen (oder, falls vorhanden, die Klassenstufe)
+          //Kurs bekommen (oder, falls vorhanden, die Klassenstufe)
           if (!oberstufe) kurs = klasseFull.replace(/[0-9]/g, '');
-          else kurs = "1e4";
+          else {
+            kurs = fach;
+            fach = fach.replace(/[0-9]/g, '');
+          }
 
           //Lehrer
           lehrer = $(".hiddenBox .foo table tbody tr:eq(1) td:eq(2)").text();
@@ -114,7 +118,7 @@ chrome.runtime.onMessage.addListener(
           });
 
         } */ else {
-          status = "error";
+          status = "unrecognised window location";
 
           //Response senden
           sendResponse({

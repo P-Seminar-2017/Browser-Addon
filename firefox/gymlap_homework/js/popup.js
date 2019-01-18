@@ -399,7 +399,7 @@ function updateDropdown(dropdownid, active, disabled, array) {
 
   // add new value
   let value = active;
-  let d = disabled ? "disabled" : "";
+  let d = disabled ? "disabled" : ""; //disables value from being used as a value
 
   $selectDropdown.prop("disabled", array.length == 0);
 

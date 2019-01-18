@@ -44,17 +44,105 @@ function initialize() {
 
           //Website angepasste Initialisierung
           updateCheckbox(globaldata_checkbox_oberstufe_id, response.oberstufe);
-          if (response.oberstufe) {
-            global_loaded_values.klassen.oberstufe = [response.klasse];
-            global_loaded_values.faecher["q" + response.klasse] = [response.fach];
-            global_loaded_values.kurse["q" + response.klasse][response.fach] = [response.kurs];
-          } else {
-            global_loaded_values.klassen.unterstufe = [response.klasse];
-            global_loaded_values.faecher.unterstufe = [response.fach];
-            global_loaded_values.stufen[response.fach] = [response.kurs];
-          }
 
-          initUI();
+          if (response.oberstufe) {
+            //Oberstufe
+            global_loaded_values.klassen.oberstufe = [response.klasse];
+
+            //Checking school data for the right lesson
+            SQLHandler.getSQLSchoolData("gymlap", function onSuccess(data) {
+              console.log("[SCHOOL_DATA]");
+              console.log(data);
+
+              let found = false;
+              for (let k = 0; k < data.length; k++) {
+                if (data[k].kurskuerzel == response.fach) {
+                  found = true;
+                  global_loaded_values.faecher["q" + response.klasse] = [data[k].fach];
+                  global_loaded_values.kurse["q" + response.klasse][data[k].fach] = [response.kurs];
+                  break;
+                }
+              }
+
+              if (!found) {
+                Navigation.showMessage("[SCHOOL_DATA] Error: Fach für Kürzel \"" + response.fach + "\" nicht gefunden");
+
+                global_loaded_values.faecher["q" + response.klasse] = [response.fach];
+                global_loaded_values.kurse["q" + response.klasse][response.fach] = [response.kurs];
+
+                //Loading all other lessons as well
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].oberstufe.includes(response.klasse)) global_loaded_values.faecher["q" + response.klasse].push(data[i].fach);
+
+                  if (data[i].oberstufe.includes(response.klasse)) {
+                    if (data[i]["kursanzahl_" + response.klasse] == 1) {
+                      global_loaded_values.kurse["q" + response.klasse][data[i].fach] = [];
+                      global_loaded_values.kurse["q" + response.klasse][data[i].fach].push((response.klasse).charAt(1) + data[i].kurskuerzel + "0");
+                    } else {
+                      global_loaded_values.kurse["q" + response.klasse][data[i].fach] = [];
+                      for (let k = 1; k <= data[i]["kursanzahl_" + response.klasse]; k++) {
+                        global_loaded_values.kurse["q" + response.klasse][data[i].fach].push((response.klasse).charAt(1) + data[i].kurskuerzel + k);
+                      }
+                    }
+                  }
+                }
+              }
+
+              initUI();
+            }, function onError(error) {
+              console.log("[SCHOOL_DATA] Error: " + error);
+              Navigation.showMessage("[SCHOOL_DATA] Error: " + error);
+
+              global_loaded_values.faecher["q" + response.klasse] = [response.fach];
+              global_loaded_values.kurse["q" + response.klasse][response.fach] = [response.kurs];
+
+              initUI();
+            });
+          } else {
+            //Unterstufe
+            global_loaded_values.klassen.unterstufe = [response.klasse];
+
+            //Checking school data for the right lesson
+            SQLHandler.getSQLSchoolData("gymlap", function onSuccess(data) {
+              console.log("[SCHOOL_DATA]");
+              console.log(data);
+
+              let found = false;
+              for (let k = 0; k < data.length; k++) {
+                if (data[k].kurskuerzel == response.fach) {
+                  found = true;
+                  global_loaded_values.faecher.unterstufe = [data[k].fach];
+                  global_loaded_values.stufen[response.fach] = [response.kurs];
+                  break;
+                }
+              }
+
+              if (!found) {
+                Navigation.showMessage("[SCHOOL_DATA] Error: Fach für Kürzel \"" + response.fach + "\" nicht gefunden");
+
+                global_loaded_values.faecher.unterstufe = [response.fach];
+                global_loaded_values.stufen[response.fach] = [response.kurs];
+
+                //Loading all other lessons as well
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].unterstufe.length > 0) {
+                    global_loaded_values.faecher.unterstufe.push(data[i].fach);
+                    global_loaded_values.stufen[data[i].fach] = data[i].unterstufe;
+                  }
+                }
+              }
+
+              initUI();
+            }, function onError(error) {
+              console.log("[SCHOOL_DATA] Error: " + error);
+              Navigation.showMessage("[SCHOOL_DATA] Error: " + error);
+
+              global_loaded_values.faecher.unterstufe = [response.fach];
+              global_loaded_values.stufen[response.fach] = [response.kurs];
+
+              initUI();
+            });
+          }
 
         } else if (response.status == "multiple" && loadFromWebsite) {
           global_loaded_values.teacher = response.lehrer;
@@ -127,11 +215,11 @@ function initialize() {
                   if (data[i].oberstufe.includes("" + j)) {
                     if (data[i]["kursanzahl_" + j] == 1) {
                       oberstufe_kurse["q" + j][data[i].fach] = [];
-                      oberstufe_kurse["q" + j][data[i].fach].push((""+j).charAt(1) + data[i].kurskuerzel + "0");
+                      oberstufe_kurse["q" + j][data[i].fach].push(("" + j).charAt(1) + data[i].kurskuerzel + "0");
                     } else {
                       oberstufe_kurse["q" + j][data[i].fach] = [];
                       for (let k = 1; k <= data[i]["kursanzahl_" + j]; k++) {
-                        oberstufe_kurse["q" + j][data[i].fach].push((""+j).charAt(1) + data[i].kurskuerzel + k);
+                        oberstufe_kurse["q" + j][data[i].fach].push(("" + j).charAt(1) + data[i].kurskuerzel + k);
                       }
                     }
                   }
@@ -172,13 +260,16 @@ function initialize() {
 
         //Oberstufe
         updateCheckbox(globaldata_checkbox_oberstufe_id, true);
-        updateDropdown(globaldata_dropdown_fach_id, global_loaded_values.faecher["q" + temp][0], false, []);
+        let selectable = global_loaded_values.faecher["q" + temp].length > 1;
+        updateDropdown(globaldata_dropdown_fach_id, global_loaded_values.faecher["q" + temp][0], false, selectable ? global_loaded_values.faecher["q" + temp] : []);
         updateDropdown(globaldata_dropdown_klasse_id, global_loaded_values.klassen.oberstufe[0], false, []);
-        updateDropdown(globaldata_dropdown_stufe_id, global_loaded_values.kurse["q" + temp][0], false, []);
+        let fach = global_loaded_values.faecher["q" + temp][0];
+        updateDropdown(globaldata_dropdown_stufe_id, global_loaded_values.kurse["q" + temp][fach][0], false, []);
       } else {
         //Unterstufe
         updateCheckbox(globaldata_checkbox_oberstufe_id, false);
-        updateDropdown(globaldata_dropdown_fach_id, global_loaded_values.faecher.unterstufe[0], false, []);
+        let selectable = global_loaded_values.faecher.unterstufe.length > 1;
+        updateDropdown(globaldata_dropdown_fach_id, global_loaded_values.faecher.unterstufe[0], false, selectable ? global_loaded_values.faecher.unterstufe : []);
         updateDropdown(globaldata_dropdown_klasse_id, global_loaded_values.klassen.unterstufe[0], false, []);
         updateDropdown(globaldata_dropdown_stufe_id, global_loaded_values.stufen[global_loaded_values.faecher.unterstufe[0]][0], false, []);
       }
