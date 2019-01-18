@@ -1,8 +1,8 @@
 # Browser-Extension
 
 - API is now hosted on the school website
-- Chrome: Working, version 1.3
-- Firefox: Working, version 1.4
+- Chrome: Retrieving data from webuntis website doesn't work, version 1.3
+- Firefox: Working, version 1.5
 
 ## Gif Showcase
 
